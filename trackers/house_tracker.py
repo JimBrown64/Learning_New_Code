@@ -3,7 +3,6 @@
 # - replace where necessary queries not using queryConstructor
 # - add data validation (check proper dates are inserted, numbers where numbers should be, etc)
 # - add confirmation for deleting row
-# - clean up use of connect() (make it so its only called once, and closed once, consider universal cursor as well)
 # - figure out what else would be proper to turn into a class (tileConstructor, for example)
 # - write proper tests (late now, but would be good to practice)
 # - fix styling
@@ -28,10 +27,8 @@ def connect():
     print("connection successful")
     return(con)
 
-def tableCheck():
+def tableCheck(cur):
     try:
-        con = connect()
-        cur = con.cursor()
         tableCheck = "SELECT 1 FROM SQLITE_SCHEMA WHERE name = 'house_tracker' AND type = 'table'"
         tablePrime = """INSERT INTO house_tracker(id, date, service, amount, source, check_number)
                         VALUES(0, '01/21/2020', 'Table Created.', 0, 'Admin', 000000)"""
@@ -50,8 +47,7 @@ def tableCheck():
             cur.execute(tablePrime)
             con.commit()
             print("Initial setup successful!")
-        cur.close()
-        con.close()
+  
         print("yes")
     except ValueError as error:
         print(error)
@@ -66,12 +62,9 @@ def queryConstructor(action, target,conditions):
     except:
         return("error in queryConstructor")
 
-def tileConstructor(rowId,index, parent):
+def tileConstructor(rowId, index, parent, cur):
     try:
-        #curIndex = str(index +1)
         rowNumber = str(index +2)
-        con = connect()
-        cur = con.cursor()
         pull = queryConstructor("SELECT ","*", "id = "+ str(rowId))
         defaultValue = IntVar()
         cur.execute(pull)
@@ -100,24 +93,19 @@ def tileConstructor(rowId,index, parent):
         ttk.Label(parent, name = "source "+str(row[0]), text=str(row[4])).grid(column=9, row=rowNumber)
         ttk.Label(parent, text="   |   ").grid(column=10, row=rowNumber)
         ttk.Label(parent, name = "checkNumber "+str(row[0]),   text=str(row[5])).grid(column=11, row=rowNumber)
-        cur.close()
-        con.close()
     except ValueError as error:
         print("Error in tileConstructor: ",error)
 
-def generateTiles(parent):
+def generateTiles(parent, cur):
     try:
-        con = connect()
-        cur = con.cursor()
         pull = queryConstructor("SELECT", "*", "")
         cur.execute(pull)
         results = cur.fetchall()
         index = 1
         for row in results:
-            tileConstructor(row[0],index,parent)
+            tileConstructor(row[0],index,parent,cur)
             index = index + 1
-        cur.close()
-        con.close()
+
     except ValueError as error:
         print("Error in generateTiles: ",error)
 
@@ -131,8 +119,7 @@ def insertButton():
 
         def saveNewRow(*args):
             try:
-                con =  connect()
-                cur = con.cursor()
+                cur = globals()["cur"]
                 cur.execute("select MAX(id)+ 1 FROM house_tracker")
                 newId = cur.fetchone()[0]
                 insertStatement = """INSERT INTO house_tracker(id, date, service, amount, source, check_number)
@@ -143,8 +130,6 @@ def insertButton():
                 con.commit()
                 globals()["mf"] = mainFrame(root)
                 newWindow.destroy()
-                cur.close()
-                con.close()
                 print("new row inserted successfully!")
             except ValueError as error:
                 print(error)
@@ -165,18 +150,17 @@ def insertButton():
         saveButton = ttk.Button(newWindow, text="save", command=saveNewRow)
         saveButton.grid(row=1, column=3)
     except ValueError as error:
-        print(error)
+        print("error in insertButton: " + error)
 
 def deleteButton():
     try:
-        con = connect()
-        cur = con.cursor()
+        #con = connect()
+        cur = globals()["cur"]#con.cursor()
         if globals()["deleteQueue"] != []:
             deleteStatement = """DELETE FROM house_tracker WHERE id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
             cur.execute(deleteStatement)
             con.commit()
-            cur.close()
-            con.close()
+
             print("delete successful.")
             globals()["deleteQueue"] = []
             globals()["mf"] = mainFrame(root)
@@ -198,16 +182,26 @@ class mainFrame():
         ttk.Label(mainframe, text="Source").grid(column=9, row=2)
         ttk.Label(mainframe, text="   |   ").grid(column=10, row=2)
         ttk.Label(mainframe,text="Check #").grid(column=11, row=2)
-        generateTiles(mainframe)
+        generateTiles(mainframe, globals()["cur"])
         ttk.Button(mainframe, text = "Insert", command= insertButton).grid(column=3, row=1)
         ttk.Button(mainframe, text="Delete", command= deleteButton).grid(column=4, row=1)
 
+def onClose():
+    try:
+        globals()["con"].close()
+        globals()["root"].destroy()
+    except ValueError as error:
+        print("Error in onClose: " + error)
 
-tableCheck()
+con = connect()
+cur = con.cursor()
+tableCheck(cur)
 root = Tk()
 root.title("House Finance Tracker")
 mf = mainFrame(root)
+root.protocol("WM_DELETE_WINDOW",onClose)
 root.mainloop()
+
 
 
 
