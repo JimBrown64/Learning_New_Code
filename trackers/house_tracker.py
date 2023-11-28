@@ -19,8 +19,17 @@
 import sqlite3
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+import datetime
 
+
+today = datetime.date.today()
+year = today.year
 deleteQueue = []
+select = "SELECT"
+insert = "INSERT"
+delete = "DELETE"
+all = "*"
 
 def connect():
     con = sqlite3.connect("appdb.db")
@@ -55,9 +64,10 @@ def tableCheck(cur):
 def queryConstructor(action, target,conditions):
     try:
         if (conditions is None or conditions == ""):
-            query = action + target + " FROM house_tracker WHERE id != 0 ORDER BY DATE ASC"
+            query = action +" "+ target + " FROM house_tracker WHERE id != 0 ORDER BY DATE ASC"
         else:
-            query = action + target + " FROM house_tracker WHERE id != 0 AND " + conditions + " ORDER BY DATE ASC"
+            query = action +" " + target + " FROM house_tracker WHERE id != 0 AND " + conditions + " ORDER BY DATE ASC"
+        
         return query
     except:
         return("error in queryConstructor")
@@ -65,7 +75,7 @@ def queryConstructor(action, target,conditions):
 def tileConstructor(rowId, index, parent, cur):
     try:
         rowNumber = str(index +2)
-        pull = queryConstructor("SELECT ","*", "id = "+ str(rowId))
+        pull = queryConstructor(select,all, "id = "+ str(rowId))
         defaultValue = IntVar()
         cur.execute(pull)
         row = cur.fetchone()
@@ -98,7 +108,7 @@ def tileConstructor(rowId, index, parent, cur):
 
 def generateTiles(parent, cur):
     try:
-        pull = queryConstructor("SELECT", "*", "")
+        pull = queryConstructor(select, "*", "")
         cur.execute(pull)
         results = cur.fetchall()
         index = 1
@@ -117,20 +127,116 @@ def insertButton():
         source = StringVar()
         check = StringVar()
 
+        def validateDate(date):
+            try:
+                resultDate = str(date).split("/")
+
+                def validateFormat(resultDate):
+                    check = 0
+                    if len(resultDate) == 3:
+                        check = 0
+                    else:
+                        check = 1
+                        return(check) 
+                    if \
+                    len(resultDate[0]) == 2 and \
+                    len(resultDate[1]) == 2 and \
+                    len(resultDate[2]) == 4: 
+                        check = 0
+                    else:
+                        check = 1
+                        return(check) 
+                    if \
+                        resultDate[0].isnumeric() is True and \
+                        resultDate[1].isnumeric() is True and \
+                        resultDate[2].isnumeric() is True:
+                            check = 0
+                    else:
+                        check = 1
+                    return(check)
+                
+                def validateMonth(resultDate):
+                    check = 0
+                    if \
+                        int(resultDate[0]) <= 12 and \
+                        int(resultDate[0]) >= 1:
+                        check = 0
+                    else:
+                        check =1
+                    return(check)
+                        
+                def validateDay(resultDate):   
+                    check = 0      
+                    if int(resultDate[0]) == 2:
+                        if \
+                        int(resultDate[1]) >= 1 and \
+                        int(resultDate[1]) <= 29:
+                            check = 0
+                        else:
+                            check = 1
+
+                    elif int(resultDate[0]) in [9,4,6,11]:
+                        if \
+                            int(resultDate[1]) >= 1 and \
+                            int(resultDate[1]) <= 30:
+                                check = 0
+                        else:
+                            check = 1
+                    else:
+                        if \
+                            int(resultDate[1]) >= 1 and \
+                            int(resultDate[1]) <= 31:
+                                check = 0
+                        else:
+                            check = 1
+                    return(check)
+                
+                def validateYear(resultDate):
+                    check = 0
+                    if  \
+                        int(resultDate[2]) >= 2000 and \
+                        int(resultDate[2]) <= year:
+                            check = 0
+                    else:
+                        check = 1
+                    return(check)
+                
+
+                if validateFormat(resultDate) != 0:
+                    return 1
+                else:
+                    if validateMonth(resultDate) != 0:
+                        return 1
+                    else:
+                        if validateDay(resultDate) != 0:
+                            return 1
+                        else:
+                            if validateYear(resultDate) != 0:
+                                return 1
+                            else:
+                                return 0 
+            except ValueError as error:
+                print("error in validateDate: " + str(error))
+
         def saveNewRow(*args):
             try:
-                cur = globals()["cur"]
-                cur.execute("select MAX(id)+ 1 FROM house_tracker")
-                newId = cur.fetchone()[0]
-                insertStatement = """INSERT INTO house_tracker(id, date, service, amount, source, check_number)
-                        VALUES(""" + str(newId) + """, '""" + date.get() + """', '""" + service.get() + """',
-                            """+ amount.get() + """, '""" + source.get() + """', """ + check.get() + """)"""
-                # print(insertStatement)
-                cur.execute(insertStatement)
-                con.commit()
-                globals()["mf"] = mainFrame(root)
-                newWindow.destroy()
-                print("new row inserted successfully!")
+                validDate = validateDate(date)
+                if validDate == 0:
+                    cur = globals()["cur"]
+                    pullId = queryConstructor(select,"MAX(id) + 1", "")
+                    cur.execute(pullId)#"select MAX(id)+ 1 FROM house_tracker")
+                    newId = cur.fetchone()[0]
+                    insertStatement = """INSERT INTO house_tracker(id, date, service, amount, source, check_number)
+                            VALUES(""" + str(newId) + """, '""" + date.get() + """', '""" + service.get() + """',
+                                """+ amount.get() + """, '""" + source.get() + """', """ + check.get() + """)"""
+                    # print(insertStatement)
+                    cur.execute(insertStatement)
+                    con.commit()
+                    globals()["mf"] = mainFrame(root)
+                    newWindow.destroy()
+                    print("new row inserted successfully!")
+                else:
+                    messagebox.showerror("showerror", "Please enter a valid date in 'MM/DD/YYYY' format.")
             except ValueError as error:
                 print(error)
 
