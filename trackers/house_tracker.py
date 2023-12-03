@@ -220,16 +220,15 @@ def insertButton():
 
         def saveNewRow(*args):
             try:
-                validDate = validateDate(date)
+                validDate = validateDate(date.get())
                 if validDate == 0:
                     cur = globals()["cur"]
-                    pullId = queryConstructor(select,"MAX(id) + 1", "")
-                    cur.execute(pullId)#"select MAX(id)+ 1 FROM house_tracker")
+                    pullId = "SELECT MAX(id) + 1 FROM house_tracker;"
+                    cur.execute(pullId)
                     newId = cur.fetchone()[0]
                     insertStatement = """INSERT INTO house_tracker(id, date, service, amount, source, check_number)
                             VALUES(""" + str(newId) + """, '""" + date.get() + """', '""" + service.get() + """',
-                                """+ amount.get() + """, '""" + source.get() + """', """ + check.get() + """)"""
-                    # print(insertStatement)
+                                """+ amount.get() + """, '""" + source.get() + """', '""" + check.get() + """')"""
                     cur.execute(insertStatement)
                     con.commit()
                     globals()["mf"] = mainFrame(root)
@@ -260,8 +259,7 @@ def insertButton():
 
 def deleteButton():
     try:
-        #con = connect()
-        cur = globals()["cur"]#con.cursor()
+        cur = globals()["cur"]
         if globals()["deleteQueue"] != []:
             deleteStatement = """DELETE FROM house_tracker WHERE id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
             cur.execute(deleteStatement)
@@ -337,7 +335,8 @@ def insert_test():
 def quickQuery():
     con = connect()
     cur = con.cursor()
-    cur.execute("SELECT * FROM house_tracker;")
+    #cur.execute("SELECT * FROM house_tracker;")
+    cur.execute("SELECT MAX(id) + 1 FROM house_tracker;")
     print(str(cur.fetchall()))
 #---- For testing ----#
 

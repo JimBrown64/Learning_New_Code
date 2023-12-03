@@ -118,7 +118,7 @@ def testValidation(input,expectation):
         print("error")
 
 
-def testSet():
+def dateTestSet():
     try:
 
         result = \
@@ -143,5 +143,11 @@ def testSet():
     except ValueError as error:
         print(error)
 
-testSet()
-#validateDate("10/10/2010")
+#dateTestSet()
+
+
+def testNumberValidation():
+    try:
+        print("yes")
+    except ValueError as error:
+        print("error")
