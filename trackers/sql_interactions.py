@@ -21,27 +21,6 @@ def tableCheck(table,cur): #checks if there is a table called {table}, returning
     except ValueError as error:
         print("error in tableCheck: " + error)
 
-# def queryConstructor(table, action, target,conditions):
-#     try:
-#         if action == select:
-#             if (conditions is None or conditions == ""):
-#                 query = action +" "+ target + " FROM " + table + " WHERE id != 0"
-#             else:
-#                 query = action +" " + target + " FROM " + table + " WHERE id != 0 AND " + conditions 
-#         elif action == insert:
-#             if (conditions is None or conditions == "" or target is None or target ==""):
-#                 print("please enter valid values")
-#             else:
-#                 query = action + " INTO " + table + "(" + target + ")" + " VALUES(" + conditions + ")"
-#         elif action == delete:
-#             if (conditions is None or conditions == ""):
-#                  query = action + " FROM " + table + " WHERE " + conditions
-#             else:
-#                 query = action + " FROM " + table + " WHERE " + conditions
-#         return query
-#     except ValueError as error:
-#         return("error in queryConstructor: " + error)
-
 def tableQuery(table, target, conditions, cur): #returns the result of the query requested.
     try:
         if (conditions is None or conditions == ""):
@@ -82,8 +61,6 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
     except ValueError as error:
         print("Error in tableInsert: " + error)
         return 0
-
-
 
 def tableConstructor(tableName, cur, con, columns):
     try:
