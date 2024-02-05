@@ -57,6 +57,7 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
         cur.execute(query)
         con.commit()                         #commit is built in. Always check data before running.
         print("Row inserted successfully!")
+        print(str(query))
         return 1
     except ValueError as error:
         print("Error in tableInsert: " + error)
