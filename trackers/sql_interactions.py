@@ -65,7 +65,7 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
 
 def tableConstructor(tableName, cur, con, columns):
     try:
-        tableConstruction = "CREATE TABLE " + tableName + " (" + columns + ")"
+        tableConstruction = "CREATE TABLE " + tableName + " (id, " + columns + ")"
         cur.execute(tableConstruction)
         con.commit()
     except ValueError as error:
