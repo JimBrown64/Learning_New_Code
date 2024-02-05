@@ -1,8 +1,6 @@
 # TO DO:
-# Fix automatically generated id's for rows (currently taken as a string, does not allow MAX(id)+1)
 # add validation for form
 # straighten out individual tiles so they line up
-# add ability to add columns to table
 # add edit row functionality
 
 
@@ -68,18 +66,13 @@ def addRow(table,cur,con,root,mainframe):
         
         def saveNewRow(cur,con,mainframe):
             try:
-                pullId = sql.tableQuery(table,"MAX(id)","",cur)
+                pullId = sql.tableQuery(table,"MAX(id)+1","",cur)
                 newId = str(pullId[0]).strip("()").replace(",","")
-                #int(newId)
-                print("new id: " + newId)
                 values = [newId]
                 for column in listInfo:
                     values.append(listInfo[column].get())
                 insertVals = str(values).strip("[]")
                 columnList = str(columns).strip("[]")                   
-                print(columnList)
-                print(insertVals)
-                # insertVals = str(newId) + insertVals
                 sql.tableInsert(table,columnList,insertVals,cur,con)
                 newWindow.destroy()
                 refreshPage(mainframe)
@@ -102,9 +95,12 @@ class mainFrame():
         root = self.root
         menubar = tk.Menu(root)
         filemenu = tk.Menu(menubar, tearoff = 0)
+        editmenu = tk.Menu(menubar, tearoff = 0)
         menubar.add_cascade(label = "File", menu = filemenu)
         filemenu.add_command(label = "New Row...", command = lambda :addRow(globals()["table"],globals()["cur"],globals()["con"],globals()["root"],self.mainframe))
         filemenu.add_command(label = "Delete Rows", command = lambda :deleteSelected(self.mainframe))
+        menubar.add_cascade(label= "Edit", menu = editmenu)
+        editmenu.add_command(label = "New Column", command = addColumn)
         root.config(menu = menubar)
 
 class tileFrame():
@@ -185,6 +181,30 @@ def headerRow(parent):
     for item in noId:
         newLabel(header.frame,item,columnNo,1)
         columnNo = columnNo +1
+
+def addColumn():
+    try:
+        table = globals()["table"]
+        cur = globals()["cur"]
+        con = globals()["con"]
+        entry = tk.StringVar()
+        newWindow = tk.Toplevel(root)
+                
+        def applyColumn():
+            newColumn = entry.get()
+            sql.editTable(table,cur,con,sql.add,newColumn)
+            newWindow.destroy()
+            # refreshPage(mainframe)
+            print("column added successfully!")
+        
+        tk.Label(newWindow, text= "New Column").grid(row=2, column=3, sticky= (tk.N,tk.W))
+        tk.Entry(newWindow,width= 20, textvariable=entry).grid(row=2, column=2)
+        saveButton = tk.Button(newWindow, text="save", command=lambda: applyColumn())
+        saveButton.grid(row=1, column=3)
+
+    except ValueError as error:
+        print("error in addColumn: " + error)
+
 
 def refreshPage(frame):
     child_frames = frame.winfo_children()

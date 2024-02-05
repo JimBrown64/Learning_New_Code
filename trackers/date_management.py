@@ -1,6 +1,7 @@
 
 import datetime
-import sql_interactions as sql
+import calendar
+import re
 today = datetime.date.today()
 year = today.year
 
@@ -9,88 +10,84 @@ year = today.year
 def validateDate(date):
     try:
         resultDate = str(date).split("/")
-
-        def validateFormat(resultDate):
+        outcome = 1
+        def validateFormat(resultDate,date):
             check = 0
-            if len(resultDate) == 3:
-                check = 0
-            else:
+            if re.search("../../....",date) is not None:
                 check = 1
-                return(check) 
-            if \
-            len(resultDate[0]) == 2 and \
-            len(resultDate[1]) == 2 and \
-            len(resultDate[2]) == 4: 
+            else:   
                 check = 0
-            else:
-                check = 1
-                return(check) 
+                return(check)
+            # if len(resultDate) == 3:
+            #     check = 1
+            # else:
+            #     check = 0
+            #     return(check) 
+            # if \
+            # len(resultDate[0]) == 2 and \
+            # len(resultDate[1]) == 2 and \
+            # len(resultDate[2]) == 4: 
+            #     check = 1
+            # else:
+            #     check = 0
+            #     return(check) 
             if \
                 resultDate[0].isnumeric() is True and \
                 resultDate[1].isnumeric() is True and \
                 resultDate[2].isnumeric() is True:
-                    check = 0
+                    check = 1
             else:
-                check = 1
+                check = 0
             return(check)
         
         def validateMonth(resultDate):
-            check = 0
+            check = 1
             if \
                 int(resultDate[0]) <= 12 and \
                 int(resultDate[0]) >= 1:
-                check = 0
+                check = 1
             else:
-                check =1
+                check = 0
             return(check)
                 
         def validateDay(resultDate):   
-            check = 0      
-            if int(resultDate[0]) == 2:
-                if \
-                int(resultDate[1]) >= 1 and \
-                int(resultDate[1]) <= 29:
-                    check = 0
-                else:
-                    check = 1
-
-            elif int(resultDate[0]) in [9,4,6,11]:
-                if \
-                    int(resultDate[1]) >= 1 and \
-                    int(resultDate[1]) <= 30:
-                        check = 0
-                else:
-                    check = 1
-            else:
-                if \
-                    int(resultDate[1]) >= 1 and \
-                    int(resultDate[1]) <= 31:
-                        check = 0
-                else:
-                    check = 1
+            check = 1      
+            check = dayRange(resultDate[2],resultDate[0],resultDate[1])
             return(check)
         
         def validateYear(resultDate):
-            check = 0
+            check = 1
             if  \
-                int(resultDate[2]) >= 2000 and \
+                int(resultDate[2]) >= 1900 and \
                 int(resultDate[2]) <= year:
-                    check = 0
+                    check = 1
             else:
-                check = 1
+                check = 0
             return(check)
-        if validateFormat(resultDate) != 0:
-            return 1
-        else:
-            if validateMonth(resultDate) != 0:
-                return 1
-            else:
-                if validateDay(resultDate) != 0:
-                    return 1
-                else:
-                    if validateYear(resultDate) != 0:
-                        return 1
-                    else:
-                        return 0 
+        
+        if validateFormat(resultDate) != 1:
+            outcome = 0
+        if outcome == 1:
+            if validateMonth(resultDate) != 1:
+                outcome = 0
+        if outcome == 1:
+            if validateDay(resultDate) != 1:
+                outcome = 0
+        if outcome == 1:
+            if validateYear(resultDate) != 1:
+                outcome = 0
+        return outcome
     except ValueError as error:
         print("error in validateDate: " + str(error))
+
+def dayRange(year,month,dayEntry):
+    rawRange = calendar.monthcalendar(year,month)
+    range = []
+    for list in rawRange:
+        for item in list:
+            if item != 0:
+                range.append(item)
+    if dayEntry not in range:
+        return 0
+    elif dayEntry in range:
+        return 1

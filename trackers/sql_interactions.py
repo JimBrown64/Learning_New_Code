@@ -73,7 +73,7 @@ def tableConstructor(tableName, cur, con, columns):
 
 def editTable(table, cur, con, action, column):
     try:
-        edit = "ALTER TABLE" + table + action + column
+        edit = "ALTER TABLE " + table + action + column
         print(edit)
         cur.execute(edit)
         con.commit()

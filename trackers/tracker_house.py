@@ -1,9 +1,7 @@
 import sqlite3
 import datetime
-import sql_interactions as sql
 import tracker_base as tb
 import tkinter as tk
-import tracker_base as tb
 today = datetime.date.today()
 year = today.year
 table = "house_tracker"
