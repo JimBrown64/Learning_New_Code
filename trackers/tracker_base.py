@@ -61,7 +61,10 @@ def addRow(table,cur,con,root,mainframe):
         for column in listColumns:
             listInfo[column] = tk.StringVar()
             tk.Label(newWindow, text= column).grid(row=row, column=3, sticky= (tk.N,tk.W))
-            tk.Entry(newWindow,width= 20, textvariable=listInfo[column]).grid(row=row, column=2)            
+            entry = tk.Entry(newWindow,width= 20, textvariable=listInfo[column])
+            entry.grid(row=row, column=2)
+            if column == 'date':
+                entry.insert(0,"MM/DD/YYYY")                
             row = row + 1
         
         def saveNewRow(cur,con,mainframe):
@@ -121,13 +124,6 @@ def createCheckbox(parent,column,row, name):
     checkbox.grid(column= column, row= row, padx=5, pady=1)
 
 def generateTiles(frame):
-    # noId = []
-    # for column in globals()["columns"]:
-    #     if column != "id":
-    #         noId.append(column)
-    #         print(column)
-    # noId = str(noId).strip("[]").replace("'", "")
-    # print(noId)
     data = sql.tableQuery(table,"*","id != 0",cur)
     rowNo = 2
     for row in data:
