@@ -3,12 +3,15 @@
 # straighten out individual tiles so they line up
 # add edit row functionality
 
+#LEFT OFF:
+# get date_management and sql_interactions imported correctly
 
 
 import sqlite3
 import datetime
 import sql_interactions as sql
 import tkinter as tk 
+from tkinter import messagebox
 import date_management as dm
 
 today = datetime.date.today()
@@ -20,12 +23,6 @@ table = "table"
 con = ""
 cur = ""
 root = ""
-
-def test():
-    print(0)
-
-def test2():
-    print(1)
 
 def loadRoot(root):
     globals()["root"] = root
@@ -73,7 +70,17 @@ def addRow(table,cur,con,root,mainframe):
                 newId = str(pullId[0]).strip("()").replace(",","")
                 values = [newId]
                 for column in listInfo:
-                    values.append(listInfo[column].get())
+                    if column == 'date':
+                        date = listInfo['date'].get()
+                        if dm.validateDate(date) != 1:
+                            print(date)
+                            messagebox.showerror("showerror", "Please enter a valid date in 'MM/DD/YYYY' format.")
+                            return 0
+                        else: 
+                            formattedDate = dm.tableFormat(listInfo['date'].get())
+                            values.append(formattedDate)
+                    else:
+                        values.append(listInfo[column].get())
                 insertVals = str(values).strip("[]")
                 columnList = str(columns).strip("[]")                   
                 sql.tableInsert(table,columnList,insertVals,cur,con)
