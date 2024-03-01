@@ -1,10 +1,8 @@
 # TO DO:
-# add validation for form
 # straighten out individual tiles so they line up
 # add edit row functionality
+# add sorting function
 
-#LEFT OFF:
-# get date_management and sql_interactions imported correctly
 
 
 import sqlite3
@@ -13,6 +11,7 @@ import sql_interactions as sql
 import tkinter as tk 
 from tkinter import messagebox
 import date_management as dm
+import re
 
 today = datetime.date.today()
 year = today.year
@@ -138,6 +137,8 @@ def generateTiles(frame):
         createCheckbox(rowFrame.frame,column=1,row = 1,name = str(row[0]))
         column = 2
         for item in row[1:]:
+            if re.search("..../../..",item) is not None:
+                item = dm.displayFormat(item)
             newLabel(parent=rowFrame.frame, text = item, column = column, row = 1)
             column = column + 1
         rowNo = rowNo +1
@@ -149,7 +150,6 @@ def queueDelete(rowId):
             ldeleteQueue.append(rowId)                 
         elif rowId in ldeleteQueue:
             ldeleteQueue.remove(rowId)
-        print(str(deleteQueue))
     except ValueError as error:
         print("error in queueDelete: " + error)
 
@@ -160,13 +160,9 @@ def deleteSelected(mainframe):
         if globals()["deleteQueue"] != []:
             conditions = """id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
             sql.tableDelete(table,conditions,cur,con)
-
             print("delete successful.")
             globals()["deleteQueue"] = []
             refreshPage(mainframe)
-            # mainframe.mainframe.destroy()
-            # mainframe = mainFrame(root)
-            # generateTiles(root)
         else:
             print("nothing to delete")
     except ValueError as error:

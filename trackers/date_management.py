@@ -17,20 +17,7 @@ def validateDate(date):
                 check = 1
             else:   
                 check = 0
-                return(check)
-            # if len(resultDate) == 3:
-            #     check = 1
-            # else:
-            #     check = 0
-            #     return(check) 
-            # if \
-            # len(resultDate[0]) == 2 and \
-            # len(resultDate[1]) == 2 and \
-            # len(resultDate[2]) == 4: 
-            #     check = 1
-            # else:
-            #     check = 0
-            #     return(check) 
+                return(check) 
             if \
                 resultDate[0].isnumeric() is True and \
                 resultDate[1].isnumeric() is True and \
