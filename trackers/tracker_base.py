@@ -1,7 +1,7 @@
 # TO DO:
-# add validation for form
 # straighten out individual tiles so they line up
 # add edit row functionality
+# add sorting function
 
 
 
@@ -9,7 +9,9 @@ import sqlite3
 import datetime
 import sql_interactions as sql
 import tkinter as tk 
+from tkinter import messagebox
 import date_management as dm
+import re
 
 today = datetime.date.today()
 year = today.year
@@ -20,12 +22,6 @@ table = "table"
 con = ""
 cur = ""
 root = ""
-
-def test():
-    print(0)
-
-def test2():
-    print(1)
 
 def loadRoot(root):
     globals()["root"] = root
@@ -61,7 +57,10 @@ def addRow(table,cur,con,root,mainframe):
         for column in listColumns:
             listInfo[column] = tk.StringVar()
             tk.Label(newWindow, text= column).grid(row=row, column=3, sticky= (tk.N,tk.W))
-            tk.Entry(newWindow,width= 20, textvariable=listInfo[column]).grid(row=row, column=2)            
+            entry = tk.Entry(newWindow,width= 20, textvariable=listInfo[column])
+            entry.grid(row=row, column=2)
+            if column == 'date':
+                entry.insert(0,"MM/DD/YYYY")                
             row = row + 1
         
         def saveNewRow(cur,con,mainframe):
@@ -70,7 +69,17 @@ def addRow(table,cur,con,root,mainframe):
                 newId = str(pullId[0]).strip("()").replace(",","")
                 values = [newId]
                 for column in listInfo:
-                    values.append(listInfo[column].get())
+                    if column == 'date':
+                        date = listInfo['date'].get()
+                        if dm.validateDate(date) != 1:
+                            print(date)
+                            messagebox.showerror("showerror", "Please enter a valid date in 'MM/DD/YYYY' format.")
+                            return 0
+                        else: 
+                            formattedDate = dm.tableFormat(listInfo['date'].get())
+                            values.append(formattedDate)
+                    else:
+                        values.append(listInfo[column].get())
                 insertVals = str(values).strip("[]")
                 columnList = str(columns).strip("[]")                   
                 sql.tableInsert(table,columnList,insertVals,cur,con)
@@ -121,13 +130,6 @@ def createCheckbox(parent,column,row, name):
     checkbox.grid(column= column, row= row, padx=5, pady=1)
 
 def generateTiles(frame):
-    # noId = []
-    # for column in globals()["columns"]:
-    #     if column != "id":
-    #         noId.append(column)
-    #         print(column)
-    # noId = str(noId).strip("[]").replace("'", "")
-    # print(noId)
     data = sql.tableQuery(table,"*","id != 0",cur)
     rowNo = 2
     for row in data:
@@ -135,6 +137,8 @@ def generateTiles(frame):
         createCheckbox(rowFrame.frame,column=1,row = 1,name = str(row[0]))
         column = 2
         for item in row[1:]:
+            if re.search("..../../..",item) is not None:
+                item = dm.displayFormat(item)
             newLabel(parent=rowFrame.frame, text = item, column = column, row = 1)
             column = column + 1
         rowNo = rowNo +1
@@ -146,7 +150,6 @@ def queueDelete(rowId):
             ldeleteQueue.append(rowId)                 
         elif rowId in ldeleteQueue:
             ldeleteQueue.remove(rowId)
-        print(str(deleteQueue))
     except ValueError as error:
         print("error in queueDelete: " + error)
 
@@ -157,13 +160,9 @@ def deleteSelected(mainframe):
         if globals()["deleteQueue"] != []:
             conditions = """id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
             sql.tableDelete(table,conditions,cur,con)
-
             print("delete successful.")
             globals()["deleteQueue"] = []
             refreshPage(mainframe)
-            # mainframe.mainframe.destroy()
-            # mainframe = mainFrame(root)
-            # generateTiles(root)
         else:
             print("nothing to delete")
     except ValueError as error:

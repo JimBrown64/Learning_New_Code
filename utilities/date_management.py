@@ -17,7 +17,20 @@ def validateDate(date):
                 check = 1
             else:   
                 check = 0
-                return(check) 
+                return(check)
+            # if len(resultDate) == 3:
+            #     check = 1
+            # else:
+            #     check = 0
+            #     return(check) 
+            # if \
+            # len(resultDate[0]) == 2 and \
+            # len(resultDate[1]) == 2 and \
+            # len(resultDate[2]) == 4: 
+            #     check = 1
+            # else:
+            #     check = 0
+            #     return(check) 
             if \
                 resultDate[0].isnumeric() is True and \
                 resultDate[1].isnumeric() is True and \
@@ -39,7 +52,7 @@ def validateDate(date):
                 
         def validateDay(resultDate):   
             check = 1      
-            check = dayRange(int(resultDate[2]),int(resultDate[0]),int(resultDate[1]))
+            check = dayRange(resultDate[2],resultDate[0],resultDate[1])
             return(check)
         
         def validateYear(resultDate):
@@ -52,7 +65,7 @@ def validateDate(date):
                 check = 0
             return(check)
         
-        if validateFormat(resultDate,date) != 1:
+        if validateFormat(resultDate) != 1:
             outcome = 0
         if outcome == 1:
             if validateMonth(resultDate) != 1:
@@ -68,7 +81,7 @@ def validateDate(date):
         print("error in validateDate: " + str(error))
 
 def dayRange(year,month,dayEntry):
-    rawRange = calendar.monthcalendar(int(year),int(month))
+    rawRange = calendar.monthcalendar(year,month)
     range = []
     for list in rawRange:
         for item in list:
@@ -83,18 +96,12 @@ def tableFormat(date):
     splitDate = date.split("/")
     year = splitDate.pop()
     splitDate.insert(0,year)
-    output = ''
-    for item in splitDate:
-        output = output + item + '/'
-    output = output[:-1]
+    output = splitDate.strip("[]").replace(",","/")
     return output
 
 def displayFormat(date):
     splitDate = date.split("/")
     year = splitDate.pop(0)
     splitDate.append(year)
-    output = ''
-    for item in splitDate:
-        output = output + item + '/'
-    output = output[:-1]
+    output = splitDate.strip("[]").replace(",","/")
     return output
