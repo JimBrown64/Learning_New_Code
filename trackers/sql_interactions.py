@@ -74,10 +74,34 @@ def tableConstructor(tableName, cur, con, columns):
 def editTable(table, cur, con, action, column):
     try:
         edit = "ALTER TABLE " + table + action + column
-        print(edit)
         cur.execute(edit)
         con.commit()
         print("Column "+ column + " altered successfully!")
     except ValueError as error:
         return("error in editTable: " + error)
+  
+def editRow(con, cur,table,column,value,conditions):
+    try:
+        update = "UPDATE " + table + " SET " + column + " = " + value + " WHERE " + conditions
+        cur.execute(update)
+        con.commit()
+        print('yes')
+    except ValueError as error:
+        return("error in editRow: " + error)
+
+
+
+
+def changetoINT(con, cur,table):
+    try:
+        data = "SELECT amount FROM "+table+" WHERE id != 0;"
+        cur.execute(data)
+        options = cur.fetchall()
+        for row in options:
+            update  = "UPDATE "+table+" SET amount = "+str(int(row[0]))+" WHERE amount = '"+row[0]+"'"
+            print(update)
+            cur.execute(update)
+            con.commit()
+    except ValueError as error:
+        return("error in changeDataType: " + error)
     
