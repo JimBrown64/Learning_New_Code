@@ -174,11 +174,13 @@ def deleteSelected(mainframe):
         cur = globals()["cur"]
         con = globals()["con"]
         if globals()["deleteQueue"] != []:
-            conditions = """id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
-            sql.tableDelete(table,conditions,cur,con)
-            print("delete successful.")
-            globals()["deleteQueue"] = []
-            refreshPage(mainframe)
+            deleteConfirmation = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete all selected rows?")
+            if deleteConfirmation:
+                conditions = """id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
+                sql.tableDelete(table,conditions,cur,con)
+                print("delete successful.")
+                globals()["deleteQueue"] = []
+                refreshPage(mainframe)
         else:
             print("nothing to delete")
     except ValueError as error:
