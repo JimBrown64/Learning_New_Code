@@ -29,13 +29,14 @@ verifyTable()
 tb.loadTableName(table)
 tb.loadColumns(table,cur)
 tb.loadConnection(con)
-sql.changetoINT(con,cur,table) #SHOULD BE COMMENTED OUT AFTER INITIAL RUN
+#sql.changetoINT(con,cur,table) #SHOULD BE COMMENTED OUT AFTER INITIAL RUN
 root = tk.Tk()
 tb.loadRoot(root)
 root.geometry("600x300")
 root.title("House Finance Tracker")
 mf = tb.mainFrame(root)
 mf.menuBar()
+tb.loadMainframe(mf)
 tb.headerRow(mf.mainframe)
 tb.generateTiles(mf.mainframe)
 

@@ -17,11 +17,12 @@ today = datetime.date.today()
 year = today.year
 
 columns = []
-deleteQueue = []
+selectedQueue = []
 table = "table"
 con = ""
 cur = ""
 root = ""
+mainframe = ""
 sortToggle = ['ASC','']
 
 def loadRoot(root):
@@ -31,6 +32,8 @@ def loadConnection(con):
     globals()["con"] = con
     globals()["cur"] = con.cursor()
     
+def loadMainframe(mainframe):
+    globals()["mainframe"] = mainframe
 
 def loadTableName(table):
     globals()["table"] = table
@@ -48,10 +51,7 @@ def addRow(table,cur,con,root,mainframe):
     try:
         newWindow = tk.Toplevel(root)
         columns = globals()["columns"]
-        listColumns = []
-        for item in columns:
-            if item != "id":
-                listColumns.append(item)
+        listColumns = columns[1:]
         listInfo = {}
         
         row = 2
@@ -120,6 +120,7 @@ class mainFrame():
         filemenu.add_command(label = "Delete Rows", command = lambda :deleteSelected(self.mainframe))
         menubar.add_cascade(label= "Edit", menu = editmenu)
         editmenu.add_command(label = "New Column", command = addColumn)
+        editmenu.add_command(label = "Edit Row", command = editRow)
         menubar.add_cascade(label= "View", menu= viewmenu)
         viewmenu.add_cascade(label = "Sort By...", menu = sortmenu)
 
@@ -142,7 +143,7 @@ def newLabel(parent, text, column, row):
 
 def createCheckbox(parent,column,row, name):
     parent.checkbox_var = tk.BooleanVar()
-    checkbox = tk.Checkbutton(parent,name=name, variable=parent.checkbox_var, command= lambda: queueDelete(name))
+    checkbox = tk.Checkbutton(parent,name=name, variable=parent.checkbox_var, command= lambda: queueRows(name))
     checkbox.grid(column= column, row= row, padx=5, pady=1)
 
 def generateTiles(frame,params=''):
@@ -159,27 +160,28 @@ def generateTiles(frame,params=''):
             column = column + 1
         rowNo = rowNo +1
 
-def queueDelete(rowId):
+def queueRows(rowId):
     try:
-        ldeleteQueue = globals()["deleteQueue"]
+        ldeleteQueue = globals()["selectedQueue"]
         if rowId not in ldeleteQueue: 
             ldeleteQueue.append(rowId)                 
         elif rowId in ldeleteQueue:
             ldeleteQueue.remove(rowId)
+        print(globals()["selectedQueue"])
     except ValueError as error:
-        print("error in queueDelete: " + error)
+        print("error in queueRows: " + error)
 
 def deleteSelected(mainframe):
     try:
         cur = globals()["cur"]
         con = globals()["con"]
-        if globals()["deleteQueue"] != []:
+        if globals()["selectedQueue"] != []:
             deleteConfirmation = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete all selected rows?")
             if deleteConfirmation:
-                conditions = """id IN (""" + str(globals()["deleteQueue"]).strip('[]') +""")"""
+                conditions = """id IN (""" + str(globals()["selectedQueue"]).strip('[]') +""")"""
                 sql.tableDelete(table,conditions,cur,con)
                 print("delete successful.")
-                globals()["deleteQueue"] = []
+                globals()["selectedQueue"] = []
                 refreshPage(mainframe)
         else:
             print("nothing to delete")
@@ -229,6 +231,7 @@ def refreshPage(frame,params = ''):
         child_frame.destroy()
     headerRow(frame)
     generateTiles(frame,params)
+    globals()["selectedQueue"] = []
 
 def newSort(frame, sortby):
     try:
@@ -249,7 +252,72 @@ def newSort(frame, sortby):
     except ValueError as error:
         print("error in newSort: "+ error)
 
+def editRow():
+    try:
+        if len(selectedQueue) != 1:
+            messagebox.showerror("showerror", "Please ensure you have one(1) row selected before editing.")
+        else:
+            print(selectedQueue[0])
+            data = sql.tableQuery(table,sql.all," id = '"+selectedQueue[0]+"'",globals()["cur"])
+            #make a form here, autofill values with pre-existing ones
+            newWindow = tk.Toplevel(root)
+            columns = globals()["columns"]
+            listColumns = columns[1:]
+            listInfo = {}
+            
+            row = 2
+            for column in listColumns:
+                listInfo[column] = tk.StringVar()
+                tk.Label(newWindow, text= column).grid(row=row, column=3, sticky= (tk.N,tk.W))
+                entry = tk.Entry(newWindow,width= 20, textvariable=listInfo[column])
+                entry.grid(row=row, column=2)
+                item = data[0][row-1]
+                if column == 'date':
+                    item = dm.displayFormat(item)
+                entry.insert(0,item)                
+                row = row + 1
+            
+            def saveRow(cur,con,mainframe):
+                try:
+                    values = [data[0][0]]
+                    for column in listInfo:
+                        if column == 'date':
+                            date = listInfo['date'].get()
+                            if dm.validateDate(date) != 1:
+                                print(date)
+                                messagebox.showerror("showerror", "Please enter a valid date in 'MM/DD/YYYY' format.")
+                                return 0
+                            else: 
+                                formattedDate = dm.tableFormat(listInfo['date'].get())
+                                values.append("'"+formattedDate+"'")
+                        elif listInfo[column].get().isnumeric():
+                                values.append(int(listInfo[column].get()))
+                        else:
+                            values.append("'"+listInfo[column].get()+"'")
+                    
+                    sets = ""
+                    columnCount = 1
+                    for column in listColumns:
+                        subString = column + " = " + str(values[columnCount]) + " , "
+                        sets = sets + subString
+                        columnCount = columnCount + 1
+                    sets = sets[:-2]
+                    query = "UPDATE " + globals()["table"] + " SET " \
+                        + sets + " WHERE id = '" + values[0] + "'" 
+                    print(query)                     
+                    cur.execute(query)
+                    con.commit()
+                    newWindow.destroy()
+                    refreshPage(mainframe)
+                    print("Row Edited successfully!")
+                except ValueError as error:
+                  print(error)
 
+        saveButton = tk.Button(newWindow, text="save", command=lambda: saveRow(cur,con,mainframe.mainframe))
+        saveButton.grid(row=1, column=3)
+        print('yes')
+    except ValueError as error:
+        print("Error in editRow: " + error)
 
 
     # def onClose():
