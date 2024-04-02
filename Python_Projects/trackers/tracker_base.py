@@ -67,10 +67,10 @@ def addRow(table,cur,con,root,mainframe):
         def saveNewRow(cur,con,mainframe):
             try:
                 pullId = sql.tableQuery(table,"MAX(id)+1","",cur)
-                newId = str(pullId[0]).strip("()").replace(",","")
+                newId = pullId[0][0]
                 values = [newId]
                 for column in listInfo:
-                    if column == 'date':
+                    if column.upper() == 'DATE':
                         date = listInfo['date'].get()
                         if dm.validateDate(date) != 1:
                             print(date)
@@ -83,6 +83,7 @@ def addRow(table,cur,con,root,mainframe):
                             values.append(int(listInfo[column].get()))
                     else:
                         values.append(listInfo[column].get())
+                print(values)
                 insertVals = str(values).strip("[]")
                 columnList = str(columns).strip("[]")                   
                 sql.tableInsert(table,columnList,insertVals,cur,con)
@@ -143,7 +144,7 @@ def newLabel(parent, text, column, row):
 
 def createCheckbox(parent,column,row, name):
     parent.checkbox_var = tk.BooleanVar()
-    checkbox = tk.Checkbutton(parent,name=name, variable=parent.checkbox_var, command= lambda: queueRows(name))
+    checkbox = tk.Checkbutton(parent,name=name, variable=parent.checkbox_var, command= lambda: queueRows(int(name)))
     checkbox.grid(column= column, row= row, padx=5, pady=1)
 
 def generateTiles(frame,params=''):
