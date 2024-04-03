@@ -138,7 +138,21 @@ class tileFrame():
 
 def newLabel(parent, text, column, row):
     try:
-        label = tk.Label(parent, text= text).grid(column= column, row= row, padx=5, pady=1)
+        info = text
+        size =12
+        if isinstance(text,str):
+            info = text[:12]
+        def showFullText():
+            textWindow =tk.Toplevel(root,width=50, height=50)
+            textWindow.title="Full Item"
+            textFrame = tk.Frame(textWindow,width=50, height=50)
+            textFrame.grid(row=1, column=1)
+            fullText = tk.Label(textFrame,text= text, wraplength=300)
+            fullText.grid(row=2, column=2, padx=10, pady=10)
+
+        label = tk.Label(parent, text= info, width=size, cursor="hand2")
+        label.grid(column= column, row= row, pady=1,sticky= tk.W)
+        label.bind("<Button-1>",lambda event:showFullText())
     except ValueError as error:
         print("Error in newLabel: " + error)
 
@@ -191,12 +205,9 @@ def deleteSelected(mainframe):
 
 def headerRow(parent):
     columns = globals()["columns"]
-    noId = []
-    for column in columns:
-        if column != "id":
-            noId.append(column)
+    noId = columns[1:]
     header = tileFrame(parent,row=1, column=1)
-    newLabel(header.frame,"     ",1,1)
+    tk.Label(header.frame, text= '', width=3).grid(column= 1, row= 1, padx=5, pady=1, sticky='W')
     columnNo = 2
     for item in noId:
         newLabel(header.frame,item,columnNo,1)
