@@ -9,12 +9,12 @@ table = "house_tracker"
 columnList = ["date", "service", "amount", "source", "check_number"]
 
 
-def connect():
+def connect(): #create connection to the database, if it doesn't exist, will create a new one of the same name.
     con = sqlite3.connect("appdb.db")
     print("connection successful")
     return(con)
 
-def verifyTable():
+def verifyTable(): #checks if table exists, if it doesn't, creates a new one and sets a row into the table as a placeholder
     if sql.tableCheck(table,cur) != 1:
         list = str(columnList).strip("[]")
         sql.tableConstructor(table,cur,con,list)
@@ -30,7 +30,7 @@ verifyTable()
 tb.loadTableName(table)
 tb.loadColumns(table,cur)
 tb.loadConnection(con)
-#sql.changetoINT(con,cur,table) #SHOULD BE COMMENTED OUT AFTER INITIAL RUN
+
 root = tk.Tk()
 tb.loadRoot(root)
 root.geometry("600x300")
