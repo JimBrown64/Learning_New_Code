@@ -7,16 +7,16 @@ year = today.year
 
 
 
-def validateDate(date): #used to verify a date is passed in the desired format. returns 1 or 0
+def validateDate(date): #used to verify a date is passed in the desired format. returns 1 for succ, or 0 for fail
     try:
         resultDate = str(date).split("/")   #take the date, convert it to a string, and turn into an array separated by "/"
-        outcome = 1                         #used to track if there is a failure during validation. 1 = success, 0 = fail
+        outcome = 1                         #used to track if there is a failure during validation. 
         def validateFormat(resultDate,date): 
             check = 0
             if re.search("../../....",date) is not None: #checks the date passed is in the specified pattern
                 check = 1                   #passes if pattern matches
             else:   
-                check = 0                   #fails if pattern does not match
+                check = 0                   
                 return(check) 
             if \
                 resultDate[0].isnumeric() is True and \
@@ -24,7 +24,7 @@ def validateDate(date): #used to verify a date is passed in the desired format. 
                 resultDate[2].isnumeric() is True:
                     check = 1               #varifies that all values in the date are numbers, if yes passes
             else:
-                check = 0                   #if all values are not numbers, fails
+                check = 0                   #if any values are not numbers, fails
             return(check)
         
         def validateMonth(resultDate):
@@ -34,7 +34,7 @@ def validateDate(date): #used to verify a date is passed in the desired format. 
                 int(resultDate[0]) >= 1:    #checks for a valid month range. 
                 check = 1                   #passes if in range
             else:
-                check = 0                   #fails if out of range
+                check = 0                   
             return(check)
                 
         def validateDay(resultDate):        #confirms the day is valid for the given month/year
@@ -42,7 +42,7 @@ def validateDate(date): #used to verify a date is passed in the desired format. 
             check = dayRange(int(resultDate[2]),int(resultDate[0]),int(resultDate[1]))
             return(check)
         
-        def validateYear(resultDate):       #confirms the year is a valid, existing year.
+        def validateYear(resultDate):       #confirms the year is a valid, existing year, setting 1900 as the minimum
             check = 1
             if  \
                 int(resultDate[2]) >= 1900 and \
@@ -87,7 +87,7 @@ def tableFormat(date): #reformats the currently accepted date to an easy-to-use 
     for item in splitDate:
         output = output + item + '/'
     output = output[:-1] #above for loop adds an additional / at the end, this removes it
-    return output #outputs date in YYYYMMDD format
+    return output #outputs date in YYYY/MM/DD format, to make sorting easier
 
 def displayFormat(date): #reformats table data to an easy to read version.
     splitDate = date.split("/")
