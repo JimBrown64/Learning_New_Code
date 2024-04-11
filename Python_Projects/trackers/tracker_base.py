@@ -78,7 +78,7 @@ def addRow(table,cur,con,root,mainframe): #creates a form the user can utilize t
                 sql.tableInsert(table,columnList,insertVals,cur,con)
                 newWindow.destroy()
                 refreshPage(mainframe)
-                print("new row inserted successfully!")
+                #print("new row inserted successfully!")
             except ValueError as error:
                 print(error)
 
@@ -183,7 +183,7 @@ def deleteSelected(mainframe): #deletes all rows from the table based on id's st
             if deleteConfirmation:
                 conditions = """id IN (""" + str(globals()["selectedQueue"]).strip('[]') +""")"""
                 sql.tableDelete(table,conditions,cur,con)
-                print("delete successful.")
+                #print("delete successful.")
                 globals()["selectedQueue"] = []
                 refreshPage(mainframe)
         else:
@@ -212,9 +212,10 @@ def addColumn(): #form for a user to add columns to the table VIA the UI
         def applyColumn():
             newColumn = entry.get()
             sql.editTable(table,cur,con,sql.add,newColumn)
+            loadColumns(table,cur)
             newWindow.destroy()
             refreshPage(globals()['mainframe'].mainframe)
-            print("column added successfully!")
+            #print("column added successfully!")
         tk.Label(newWindow, text= "New Column").grid(row=2, column=3, sticky= (tk.N,tk.W))
         tk.Entry(newWindow,width= 20, textvariable=entry).grid(row=2, column=2)
         saveButton = tk.Button(newWindow, text="save", command=lambda: applyColumn())
@@ -254,7 +255,7 @@ def editRow(): #form to allow a row to be edited after creation
             data = sql.tableQuery(table,sql.all," id = "+str(selectedQueue[0])+"",globals()["cur"])
             newWindow = tk.Toplevel(root)
             columns = globals()["columns"]
-            listColumns = columns[1:]
+            listColumns = columns[1:] #this is correct
             listInfo = {}
             
             row = 2
@@ -264,6 +265,8 @@ def editRow(): #form to allow a row to be edited after creation
                 entry = tk.Entry(newWindow,width= 20, textvariable=listInfo[column])
                 entry.grid(row=row, column=2)
                 item = data[0][row-1]
+                if item is None:
+                    item = ""
                 if column == 'date':
                     item = dm.displayFormat(item)
                 entry.insert(0,item)                
@@ -299,7 +302,7 @@ def editRow(): #form to allow a row to be edited after creation
                     con.commit()
                     newWindow.destroy()
                     refreshPage(mainframe)
-                    print("Row Edited successfully!")
+                    #print("Row Edited successfully!")
                 except ValueError as error:
                   print(error)
 
