@@ -42,7 +42,7 @@ def tableDelete(table, conditions, cur, con): #deletes items where CONDITIONS ar
             query = "DELETE FROM " + table + " WHERE " + conditions
         cur.execute(query)
         con.commit()                         #commit is built in. Always check data before running.
-        print("Delete successful.")
+        #print("Delete successful.")
         return 1
     except ValueError as error:
         print(error)
@@ -56,7 +56,7 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
             query = "INSERT INTO " + table + "(" + columns + ")" + " VALUES(" + values + ")"
         cur.execute(query)
         con.commit()                         #commit is built in. Always check data before running.
-        print("Row inserted successfully!")
+        #print("Row inserted successfully!")
         return 1
     except ValueError as error:
         print("Error in tableInsert: " + error)
@@ -75,7 +75,7 @@ def editTable(table, cur, con, action, column): #removes or adds a {column} to {
         edit = "ALTER TABLE " + table + action + column
         cur.execute(edit)
         con.commit()                            #commit is built in. Always check data before running.
-        print("Column "+ column + " altered successfully!")
+        #print("Column "+ column + " altered successfully!")
     except ValueError as error:
         return("error in editTable: " + error)
   
