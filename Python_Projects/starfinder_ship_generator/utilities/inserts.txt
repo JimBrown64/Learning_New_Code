@@ -13,3 +13,5 @@ sql.tableInsert("Weapons","id","Name","Range","Speed","Damage","PCU","Special","
 sql.tableInsert("Expansion_Bays","id","Name","PCU","Cost","id","Name","PCU","Cost",cur,con)
 sql.tableInsert("Size","id","Size","Modifier","id","Size","Modifier",cur,con)
 sql.tableInsert("Maneuverability","id","Manueverability","Modifier","Turn","id","Manueverability","Modifier","Turn",cur,con)
+
+THIS IS A TEST 2
