@@ -1,5 +1,6 @@
 import sqlite3
-
+import sys
+print("sys.path: "+ str(sys.path))
 select = "SELECT"
 insert = "INSERT"
 delete = "DELETE"
@@ -13,7 +14,7 @@ def tableCheck(table,cur): #checks if there is a table called {table}, returning
         output = 0
         tableCheck = "SELECT 1 FROM SQLITE_SCHEMA WHERE name = '" + table + "' AND type = 'table'"
         cur.execute(tableCheck)
-        tableResult = cur.fetchall() 
+        tableResult = cur.fetchall()
         if tableResult != []:
             output = 1
         else: output = 0
@@ -24,7 +25,7 @@ def tableCheck(table,cur): #checks if there is a table called {table}, returning
 def tableQuery(table, target, conditions, cur): #returns the result of the query requested.
     try:
         if (conditions is None or conditions == ""):
-            query =  "SELECT "+ target + " FROM " + table 
+            query =  "SELECT "+ target + " FROM " + table #+ " WHERE id != 0"
         else:
             query = "SELECT " + target + " FROM " + table + " WHERE " + conditions 
         cur.execute(query)
@@ -42,7 +43,7 @@ def tableDelete(table, conditions, cur, con): #deletes items where CONDITIONS ar
             query = "DELETE FROM " + table + " WHERE " + conditions
         cur.execute(query)
         con.commit()                         #commit is built in. Always check data before running.
-        #print("Delete successful.")
+        print("Delete successful.")
         return 1
     except ValueError as error:
         print(error)
@@ -56,13 +57,14 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
             query = "INSERT INTO " + table + "(" + columns + ")" + " VALUES(" + values + ")"
         cur.execute(query)
         con.commit()                         #commit is built in. Always check data before running.
-        #print("Row inserted successfully!")
+        print("Row inserted successfully!")
+        print(str(query))
         return 1
     except ValueError as error:
         print("Error in tableInsert: " + error)
         return 0
 
-def tableConstructor(tableName, cur, con, columns): #creates a table called {tableName} with columns {columns}
+def tableConstructor(tableName, cur, con, columns):
     try:
         tableConstruction = "CREATE TABLE " + tableName + " (id, " + columns + ")"
         cur.execute(tableConstruction)
@@ -70,35 +72,13 @@ def tableConstructor(tableName, cur, con, columns): #creates a table called {tab
     except ValueError as error:
         return("error in tableConstructor: " + error)
 
-def editTable(table, cur, con, action, column): #removes or adds a {column} to {table}
+def editTable(table, cur, con, action, column):
     try:
         edit = "ALTER TABLE " + table + action + column
+        print(edit)
         cur.execute(edit)
-        con.commit()                            #commit is built in. Always check data before running.
-        #print("Column "+ column + " altered successfully!")
+        con.commit()
+        print("Column "+ column + " altered successfully!")
     except ValueError as error:
         return("error in editTable: " + error)
-  
-def editRow(con, cur,table,column,value,conditions): #updates a row in {table} based on {conditions}. only configured for one {column at a time}
-    try:
-        update = "UPDATE " + table + " SET " + column + " = " + value + " WHERE " + conditions
-        cur.execute(update)
-        con.commit()                             #commit is built in. Always check data before running.
-    except ValueError as error:
-        return("error in editRow: " + error)
-
-
-
-
-def changetoINT(con, cur,table):     #built to correct an issue where numbers were saved as strings.
-    try:
-        data = "SELECT amount FROM "+table+" WHERE id != 0;"
-        cur.execute(data)
-        options = cur.fetchall()
-        for row in options:
-            update  = "UPDATE "+table+" SET amount = "+str(int(row[0]))+" WHERE amount = '"+row[0]+"'"
-            cur.execute(update)
-            con.commit()
-    except ValueError as error:
-        return("error in changeDataType: " + error)
     
