@@ -15,8 +15,8 @@ def connect():
     con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
     return(con)
 
-def verifyTables(): #checks if tables exists, if it doesn't, 
-    #creates a new one and sets a row into the table as a placeholder
+def verifyTables(): #checks if tables exists, if they don't, 
+    #creates a them
     for table in bootup.tableList:
         if sql.tableCheck(table,cur) != 1:
             columns = ",".join(bootup.tableList[table])
@@ -28,6 +28,11 @@ def verifyTables(): #checks if tables exists, if it doesn't,
 con = connect()
 cur = con.cursor()
 verifyTables()
+
+
+
+
+
 
 
 

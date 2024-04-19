@@ -7,8 +7,6 @@ Functions of the app:
 - Edit ships after saving
 
 Tables and columns:
-* size may be moved to a separate table
-* all specials may be moved to a separate table
 - Ships:
     - Ships:
         - Name
@@ -31,6 +29,9 @@ Tables and columns:
         - Size
         - PCU (power core units. How much power the core generates)
         - Cost
+    - Power Core Sizes:
+        - Power_Core_id
+        - size
     - Thrusters:
         - Name
         - Size
@@ -87,27 +88,21 @@ Tables and columns:
         - PCU (cost in PCU)
         - Cost
     - Mounts:
-        - Ship_id
-        - forward light
-        - forward heavy
-        - forward capital
-        - aft light
-        - aft heavy
-        - aft capital
-        - starboard light
-        - starboard heavy 
-        - starboard capital
-        - port light 
-        - port heavy
-        - port capital 
+        - Frame_id
+        - Arc
+        - Weight
+        - Count
     - Size:
         - id
         - size
 
-    - Maneuverability
+    - Maneuverability:
         - Maneuverability(word)
         - Bonus
-
+    - Special:
+            TL(target lock),
+            Turn_Distance,
+            Effect(catch all for additional abilities)
 - Crew:
     - Crew:
         - Role (captain, pilot, science officer, engineer, gunner)
