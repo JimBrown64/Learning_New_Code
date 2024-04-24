@@ -27,6 +27,7 @@ def tableQuery(table, target, conditions, cur): #returns the result of the query
             query =  "SELECT "+ target + " FROM " + table 
         else:
             query = "SELECT " + target + " FROM " + table + " WHERE " + conditions 
+            print(query)
         cur.execute(query)
         result = cur.fetchall()
         return result

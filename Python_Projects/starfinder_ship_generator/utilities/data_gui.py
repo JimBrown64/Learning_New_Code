@@ -3,9 +3,9 @@ import sql_interactions as sql
 import sqlite3
 
 
-table = "Frame_Mounts"
+table = "Frames"
 columns = []
-
+alt_Statement = ""
 
 def connect():
     con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
@@ -74,8 +74,12 @@ def createCheckbox(parent,column,row, name):
     checkbox = tk.Checkbutton(parent,name=name, variable=parent.checkbox_var)
     checkbox.grid(column= column, row= row, padx=5, pady=1)
 
-def generateTiles(frame,params=''): #gathers data from the table and creates a row tile for each row in the table
-    data = sql.tableQuery(table,"*",""+ params,cur)
+def generateTiles(frame,cur,params=''): #gathers data from the table and creates a row tile for each row in the table
+    if globals()["alt_Statement"] == "":
+        data = sql.tableQuery(table,"*",""+ params,cur)
+    else:
+        cur.execute(globals()["alt_Statement"])
+        data = cur.fetchall()
     rowNo = 2
     for row in data:
         rowFrame = tileFrame(frame,rowNo,1)
@@ -116,6 +120,6 @@ root.geometry("600x300")
 mf= mainFrame(root)
 loadColumns(table,cur)
 headerRow(mf.mainframe)
-generateTiles(mf.mainframe)
+generateTiles(mf.mainframe,cur)
 
 root.mainloop()

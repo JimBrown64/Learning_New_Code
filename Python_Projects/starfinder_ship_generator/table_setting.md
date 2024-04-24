@@ -7,6 +7,11 @@ Functions of the app:
 - Edit ships after saving
 
 Tables and columns:
+- Tier:
+    - Tier:
+        - Tier
+        - Build_Points
+
 - Ships:
     - Ships:
         - Name
