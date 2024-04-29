@@ -9,7 +9,8 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 import utilities.sql_interactions as sql
-import bootup
+# import bootup
+import raw_data
 
 
 def connect():
@@ -17,10 +18,10 @@ def connect():
     return(con)
 
 def verifyTables(): #checks if tables exists, if they don't, 
-    #creates a them
-    for table in bootup.tableList:
+                    #creates a them
+    for table in raw_data.tableList:
         if sql.tableCheck(table,cur) != 1:
-            columns = ",".join(bootup.tableList[table])
+            columns = ",".join(raw_data.tableList[table])
             sql.tableConstructor(table,cur,con,columns)
             print("Table ",table," created!")
         else:
@@ -192,11 +193,11 @@ con = connect()
 cur = con.cursor()
 verifyTables()
 # bootup.insertData() 
-baseSet(1,"Fighter","Micron Heavy",cur)
-thrusters = selectThrusters(BP,shipSize,PCU,cur)
-shields = selectShields(BP,PCU)
-fillWeapons(BP,PCU,frameMounts)
-printValues()
+# baseSet(1,"Fighter","Micron Heavy",cur)
+# thrusters = selectThrusters(BP,shipSize,PCU,cur)
+# shields = selectShields(BP,PCU)
+# fillWeapons(BP,PCU,frameMounts)
+# printValues()
 
 
 

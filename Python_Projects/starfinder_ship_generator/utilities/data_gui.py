@@ -3,9 +3,34 @@ import sql_interactions as sql
 import sqlite3
 
 
-table = "Frames"
+table = "Tier"
 columns = []
 alt_Statement = ""
+# alt_Statement = "SELECT * FROM frame_mounts WHERE frame_id = 3"
+alt_Statement = "SELECT  tier.build_points AS BP, \
+                    Frame.name,size.size, \
+                    mount_totals.weight AS mount_weight, mount_totals.mount_count AS mount_quantity, \
+                    maneuverability.maneuverability, \
+                    frame.expansion_bays, \
+                    power_core.name AS power_core_name, power_core.pcu, \
+                    thrusters.name AS thruster_name, \
+                    (tier.build_points - Frame.cost - power_core.cost - thrusters.cost) AS remaining_bp\
+                FROM Frame \
+                JOIN (SELECT SUM(frame_mounts.count) AS mount_count,frame_mounts.weight,frame_mounts.frame_id \
+                     FROM frame_mounts \
+                     GROUP BY frame_mounts.frame_id,frame_mounts.weight)AS mount_totals ON Frame.id = mount_totals.frame_id \
+                JOIN maneuverability ON Frame.maneuverability = maneuverability.id \
+                JOIN Tier ON Frame.Cost < Tier.Build_Points \
+                JOIN size ON Frame.size = size.id \
+                JOIN power_core ON power_core.id = power_core_size.power_core_id \
+                JOIN power_core_size ON Frame.size = power_core_size.size \
+                JOIN thrusters ON Frame.size = thrusters.size \
+                WHERE tier.tier = 1 \
+                    AND frame.Maximum_crew >= 4 \
+                    AND mount_quantity > 1 \
+                    AND remaining_bp > 25 \
+                    AND power_core.PCU > 100 \
+                ;"
 
 def connect():
     con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
@@ -15,33 +40,8 @@ class mainFrame(): #class used to create the main window, with primary needed fu
     def __init__(self, root):
         self.root = root
         self.mainframe = tk.Frame(self.root)
-        self.mainframe.grid(column=0, row=0, sticky=(tk.N, tk.W),padx=5, pady=5)
+        self.mainframe.grid(column=0, row=1, sticky=(tk.N, tk.W),padx=5, pady=5)
 
-    # def menuBar(self): #adds a menubar to the mainFrame
-    #     root = self.root
-    #     menubar = tk.Menu(root)
-    #     filemenu = tk.Menu(menubar, tearoff = 0)
-    #     editmenu = tk.Menu(menubar, tearoff = 0)
-    #     viewmenu = tk.Menu(menubar,tearoff= 0)
-    #     sortmenu = tk.Menu(viewmenu,tearoff= 0)
-    #     menubar.add_cascade(label = "File", menu = filemenu)
-    #     filemenu.add_command(label = "New Row...", \
-    #                          command = lambda :addRow(globals()["table"],\
-    #                                                   globals()["cur"],\
-    #                                                   globals()["con"],\
-    #                                                   globals()["root"],\
-    #                                                   self.mainframe))
-    #     filemenu.add_command(label = "Delete Rows", command = lambda :deleteSelected(self.mainframe))
-    #     menubar.add_cascade(label= "Edit", menu = editmenu)
-    #     editmenu.add_command(label = "New Column", command = addColumn)
-    #     editmenu.add_command(label = "Edit Row", command = editRow)
-    #     menubar.add_cascade(label= "View", menu= viewmenu)
-    #     viewmenu.add_cascade(label = "Sort By...", menu = sortmenu)
-
-    #     for column in columns[1:]:
-    #         sortmenu.add_command(label= column, command= lambda col = column: newSort(self.mainframe,col))    
-       
-    #     root.config(menu = menubar)
 
 class tileFrame(): #each row of info is stored in a seperate frame, called tiles.
     def __init__(self,parent,row,column):
@@ -104,7 +104,10 @@ def headerRow(parent): #creates headers for table columns
 
 def loadColumns(table,cur): #gets the column names from the table
     listColumns = []
-    pullColumns = "SELECT * FROM " + table
+    if globals()["alt_Statement"] == "":
+        pullColumns = "SELECT * FROM " + table
+    else:
+        pullColumns = globals()["alt_Statement"]
     data = cur.execute(pullColumns)
     for column in data.description:
         listColumns.append(str(column[0]))
@@ -114,12 +117,23 @@ def loadColumns(table,cur): #gets the column names from the table
 con = connect()
 cur = con.cursor()
 
-
+# cur.execute(alt_Statement)
+# print(cur.fetchall())
 root = tk.Tk()
 root.geometry("600x300")
-mf= mainFrame(root)
+
+scrollbar = tk.Scrollbar(root, orient=tk.VERTICAL)
+scrollbar.grid(column= 0, row =0)
+# scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+canvas = tk.Canvas(root, width=400, height=300, bg="white")
+canvas.grid(column=0, row=1)
+# canvas.pack(fill=tk.BOTH, expand=True)
+scrollbar.config( command=canvas.yview)
+mf= mainFrame(canvas)
 loadColumns(table,cur)
 headerRow(mf.mainframe)
 generateTiles(mf.mainframe,cur)
-
+mf.mainframe.bind("<Configure>", lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all")))
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(-1 * (event.delta // 120), "units"))
 root.mainloop()
