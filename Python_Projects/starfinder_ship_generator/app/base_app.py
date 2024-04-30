@@ -1,6 +1,6 @@
+"""Module to utilize other app components to build a ship"""
 import sqlite3
 import random
-
 import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,18 +10,18 @@ if parent_dir not in sys.path:
 
 import utilities.sql_interactions as sql
 # import bootup
-import raw_data
-
+import app.raw_data
 
 def connect():
-    con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
-    return(con)
+    """create connection to database"""
+    connection = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
+    return connection
 
-def verifyTables(): #checks if tables exists, if they don't, 
-                    #creates a them
-    for table in raw_data.tableList:
+def verify_tables():
+    """checks if tables exists, if they don't, creates a them"""                
+    for table, column_set in app.raw_data.table_list.items():
         if sql.tableCheck(table,cur) != 1:
-            columns = ",".join(raw_data.tableList[table])
+            columns = ",".join(column_set)
             sql.tableConstructor(table,cur,con,columns)
             print("Table ",table," created!")
         else:
@@ -29,180 +29,172 @@ def verifyTables(): #checks if tables exists, if they don't,
 
 
 
-BP = 0
-PCU = 0
-frameId = 0
-shipSize = 0
-frameMounts = {'Light':0, 'Heavy':0, 'Capital':0}
+total_bp = 0
+total_pcu = 0
+frame_id = 0
+ship_size = 0
+frame_mounts = {'Light':0, 'Heavy':0, 'Capital':0}
 weapons = []
 
-def baseSet(tier,frame,powerCore,cur): #take in base info, assign bp, pcu, frameid, and shipSize, 
-    try:                                   #which will be utilized throughout
-        bpStatement = "SELECT Tier.Build_Points \
+def base_set(tier,frame,power_core,cursor):
+    """take in base info, assign bp, pcu, frame_id, and ship_size, which will be utilized throughout"""
+    try:
+        bp_statement = "SELECT Tier.Build_Points \
                     FROM Tier \
                     WHERE tier = " + str(tier)+";"
-        frameStatement = "SELECT Frames.id,Frames.size,Frames.Cost, Frame_Mounts.weight, Frame_Mounts.count \
+        frame_statement = "SELECT Frames.id,Frames.size,Frames.Cost, Frame_Mounts.weight, Frame_Mounts.count \
                         FROM Frames \
                         JOIN Frame_Mounts ON Frames.id = Frame_Mounts.frame_id\
                         WHERE Name = '" + frame +"';"
-        powerCoreStatement = "SELECT Power_Core_Size.size, Power_Cores.Cost, Power_Cores.PCU \
+        power_core_statement = "SELECT Power_Core_Size.size, Power_Cores.Cost, Power_Cores.PCU \
                             FROM power_cores \
                             JOIN Power_Core_Size ON Power_Cores.id = Power_Core_Size.Power_Core_Id \
-                            WHERE Power_Cores.name = '" + powerCore +"';"
-        cur.execute(bpStatement)
-        bpResult = cur.fetchall()
-        cur.execute(frameStatement)
-        frameResult = cur.fetchall()
-        print("FrameResult: ",frameResult)
-        cur.execute(powerCoreStatement)
-        pcResult = cur.fetchall()
-        for record in frameResult:
-            globals()["frameMounts"][record[3]] += record[4]
-        print("allowedMounts: ",globals()["frameMounts"])
-        baseBP = bpResult[0][0]
-        frameSize = frameResult[0][1]
-        coreSize = pcResult[0][0]
-        basePCU = pcResult[0][2]
-        frameCost = frameResult[0][2]
-        pcCost = pcResult[0][1]
-        totalCost = frameCost + pcCost
+                            WHERE Power_Cores.name = '" + power_core +"';"
+        cursor.execute(bp_statement)
+        bp_result = cursor.fetchall()
+        cursor.execute(frame_statement)
+        frame_result = cursor.fetchall()
+        cursor.execute(power_core_statement)
+        pc_result = cursor.fetchall()
+        for record in frame_result:
+            globals()["frame_mounts"][record[3]] += record[4]
+        print("allowedMounts: ",globals()["frame_mounts"])
+        base_bp = bp_result[0][0]
+        frame_size = frame_result[0][1]
+        core_size = pc_result[0][0]
+        base_pcu = pc_result[0][2]
+        frame_cost = frame_result[0][2]
+        pc_cost = pc_result[0][1]
+        total_cost = frame_cost + pc_cost
 
-        if frameSize != coreSize:
+        if frame_size != core_size:
             print("Core size incorrect for the selected frame!")
         else:
-            remainingBP = baseBP - totalCost 
-            globals()["BP"] = remainingBP
-            globals()["PCU"] = basePCU
-            globals()["frameId"] = frameResult[0][0]
-            globals()["shipSize"] = frameSize
+            remaining_bp = base_bp - total_cost
+            globals()["total_bp"] = remaining_bp
+            globals()["total_pcu"] = base_pcu
+            globals()["frame_id"] = frame_result[0][0]
+            globals()["ship_size"] = frame_size
     except ValueError as error:
         print("error in baseSet: ", error)
 
 
-def selectThrusters(BP,Size,PCU,cur): #choose thrusters based on size, remaining pcu, and remaining BP
+def select_thrusters(bp,size,pcu,cursor):
+    """choose thrusters based on size, remaining pcu, and remaining BP"""
     try:
-        thrusterStatement = "SELECT Thrusters.Name, Thrusters.Size, Thrusters.PCU, Thrusters.Cost \
+        thruster_statement = "SELECT Thrusters.Name, Thrusters.size, Thrusters.pcu, Thrusters.Cost \
                             FROM Thrusters\
-                            WHERE Thrusters.Size = " + str(Size) +" AND Thrusters.Cost < "+ str(BP)+ \
-                                " AND Thrusters.PCU < "+str(PCU)+";"
-        cur.execute(thrusterStatement)
-        thrusterResult = cur.fetchall()
-        thrusterSelection = random.choice(thrusterResult)
-        print("thrusterSelection: ",thrusterSelection)
-        thrusterPCU = thrusterSelection[2]
-        thrusterCost = thrusterSelection[3]
+                            WHERE Thrusters.size = " + str(size) +" AND Thrusters.Cost < "+ str(bp)+ \
+                                " AND Thrusters.pcu < "+str(pcu)+";"
+        cursor.execute(thruster_statement)
+        thruster_result = cursor.fetchall()
+        thruster_selection = random.choice(thruster_result)
+        print("thruster_selection: ",thruster_selection)
+        thruster_pcu = thruster_selection[2]
+        thruster_cost = thruster_selection[3]
 
-        remainingPCU = globals()["PCU"] - thrusterPCU
-        print("Starting PCU(",globals()["PCU"],") - thrusterPCU(",thrusterPCU,") = ", remainingPCU)
-        remainingBP = globals()["BP"] - thrusterCost
-        print("Starting BP(",globals()["BP"],") - thrusterCost(",thrusterCost,") = ", remainingBP)
-        globals()["PCU"] = remainingPCU
-        globals()["BP"] = remainingBP
+        remaining_pcu = globals()["total_pcu"] - thruster_pcu
+        print("Starting PCU(",globals()["total_pcu"],") - thrusterPCU(",thruster_pcu,") = ", thruster_pcu)
+        remaining_bp = globals()["total_bp"] - thruster_cost
+        print("Starting BP(",globals()["total_bp"],") - thruster_cost(",thruster_cost,") = ", remaining_bp)
+        globals()["total_pcu"] = remaining_pcu
+        globals()["total_bp"] = remaining_bp
 
-        return thrusterSelection[0]
+        return thruster_selection[0]
     except ValueError as error:
-        print("error in selectThrusters: ",error)
+        print("error in select_thrusters: ",error)
 
-def selectWeapon(BP,PCU,size): #Selects a weapon based on remaining bp, pcu, and what mounts are available
-    try: 
-        frameMounts = globals()["frameMounts"]
-        if frameMounts[size] != 0:
-            weaponsStatement = "SELECT Weapons.id, Weapons.Name, Weapons.PCU, Weapons.Cost \
-                                FROM Weapons \
-                                WHERE Weapons.Weight IN ('"+ size+"')\
-                                    AND Weapons.Cost < "+ str(BP) + \
-                                    " AND Weapons.PCU < " + str(PCU) +";" # only checking less than to ensure 
-                                                                          # there is some budget left for both 
+def select_weapon(bp,pcu,size,cursor):
+    """Selects a weapon based on remaining bp, pcu, and what mounts are available"""
+    try:
+        mounts = globals()["frame_mounts"]
+        if mounts[size] != 0:
+            weapons_statement = "SELECT weapons.id, weapons.Name, weapons.pcu, weapons.Cost \
+                                FROM weapons \
+                                WHERE weapons.Weight IN ('"+ size+"')\
+                                    AND weapons.Cost < "+ str(bp) + \
+                                    " AND weapons.pcu < " + str(pcu) +";" # only checking less than to ensure 
+                                                                          # there is some budget left for both
                                                                           # PCU and BP
-            cur.execute(weaponsStatement)
-            weaponsResult = cur.fetchall()
-            weaponSelection = random.choice(weaponsResult)
-            weaponPCU = weaponSelection[2]
-            weaponCost = weaponSelection[3]
-            remainingPCU = globals()["PCU"] - weaponPCU
-            print("Starting PCU(",globals()["PCU"],") - weaponPCU(",weaponPCU,") = ", remainingPCU)
-            remainingBP = globals()["BP"] - weaponCost
-            print("Starting BP(",globals()["BP"],") - weaponCost(",weaponCost,") = ", remainingBP)
-            globals()["PCU"] = remainingPCU
-            globals()["BP"] = remainingBP
-            frameMounts[size] -= 1
-            print("frameMounts: ", frameMounts)
-            print("weaponsResult: ",weaponsResult)
-            return(weaponSelection[1])
-        else:
-            print("No available mounts of this size")
-            return 0
+            cursor.execute(weapons_statement)
+            weapons_result = cursor.fetchall()
+            weapon_selection = random.choice(weapons_result)
+            weapon_pcu = weapon_selection[2]
+            weapon_cost = weapon_selection[3]
+            remaining_pcu = globals()["total_pcu"] - weapon_pcu
+            print("Starting PCU(",globals()["total_pcu"],") - weaponPCU(",weapon_pcu,") = ", remaining_pcu)
+            remaining_bp = globals()["total_bp"] - weapon_cost
+            print("Starting BP(",globals()["total_bp"],") - weaponCost(",weapon_cost,") = ", remaining_bp)
+            globals()["total_pcu"] = remaining_pcu
+            globals()["total_bp"] = remaining_bp
+            mounts[size] -= 1
+            print("frame_mounts: ", frame_mounts)
+            print("weapons_result: ",weapons_result)
+            return weapon_selection[1]
+
+        print("No available mounts of this size")
+        return 0
     except ValueError as error:
-        print("error in selectWeapon: ",error)
+        print("error in select_weapon: ",error)
 
 
-def fillWeapons(BP,PCU,mounts):
+def fill_weapons(bp,pcu,mounts,cursor):
+    """Select weapons until all mounts are used, or the budget is used up"""
     try:
-        if BP > 0 and PCU > 0:  
+        if bp > 0 and pcu > 0:
             for size in mounts:
-                while mounts[size] > 0 and BP >0 and PCU >0:
-                    newWeapon = selectWeapon(BP,PCU,size)
-                    if newWeapon != 0:
-                        globals()["weapons"].append(newWeapon)
-                        print("newWeapon: ", newWeapon)
+                while mounts[size] > 0 and bp >0 and pcu >0:
+                    new_weapon = select_weapon(bp,pcu,size,cursor)
+                    if new_weapon != 0:
+                        globals()["weapons"].append(new_weapon)
+                        print("new_weapon: ", new_weapon)
     except ValueError as error:
-        print("error in fillWeapons: ", error)
+        print("error in fill_weapons: ", error)
 
-def selectShields(BP,PCU):
+def select_shields(bp,pcu,cursor):
+    """select a shield to use based on remaining bp and pcu"""
     try:
-        if BP > 0 and PCU > 0:
+        if bp > 0 and pcu > 0:
 
-            shieldStatement = "SELECT Shields.Name, Shields.PCU, Shields.Cost \
+            shield_statement = "SELECT Shields.Name, Shields.pcu, Shields.Cost \
                         FROM Shields\
-                        WHERE Shields.Cost < "+ str(BP)+ \
-                            " AND Shields.PCU < "+str(PCU)+";"
-            cur.execute(shieldStatement)
-            shieldResult = cur.fetchall()
-            shieldSelection = random.choice(shieldResult)
-            print("shieldSelection: ",shieldSelection)
-            shieldPCU = shieldSelection[1]
-            shieldCost = shieldSelection[2]
+                        WHERE Shields.Cost < "+ str(bp)+ \
+                            " AND Shields.pcu < "+str(pcu)+";"
+            cursor.execute(shield_statement)
+            shield_result = cursor.fetchall()
+            shield_selection = random.choice(shield_result)
+            print("shield_selection: ",shield_selection)
+            shield_pcu = shield_selection[1]
+            shield_cost = shield_selection[2]
 
-            remainingPCU = globals()["PCU"] - shieldPCU
-            print("Starting PCU(",globals()["PCU"],") - shieldPCU(",shieldPCU,") = ", remainingPCU)
-            remainingBP = globals()["BP"] - shieldCost
-            print("Starting BP(",globals()["BP"],") - shieldCost(",shieldCost,") = ", remainingBP)
-            globals()["PCU"] = remainingPCU
-            globals()["BP"] = remainingBP
-            return shieldSelection[0]
-        else: 
-            print("No more alotted budget")
-
+            remaining_pcu = globals()["total_pcu"] - shield_pcu
+            print("Starting pcu(",globals()["total_pcu"],") - shield_pcu(",shield_pcu,") = ", remaining_pcu)
+            remaining_bp = globals()["total_bp"] - shield_cost
+            print("Starting BP(",globals()["total_bp"],") - shield_cost(",shield_cost,") = ", remaining_bp)
+            globals()["total_pcu"] = remaining_pcu
+            globals()["total_bp"] = remaining_bp
+            return shield_selection[0]
+        print("No more alotted budget")
+        return 0
 
     except ValueError as error:
-        print("error in selectShields: ", error)
+        print("error in select_shields: ", error)
 
 
 
 
- 
-
-
-
-def printValues():
-    print("BP: ",globals()["BP"], " PCU: ", globals()["PCU"], " Size: ", 
-          globals()["shipSize"]," thrusters: ", globals()['thrusters']," weapons: ", globals()["weapons"])
+def print_values():
+    """prints final values. meant for testing"""
+    print("BP: ",globals()["total_bp"], " PCU: ", globals()["total_pcu"], " size: ",
+          globals()["ship_size"]," thrusters: ", globals()['thrusters']," weapons: ", globals()["weapons"])
 
 
 con = connect()
 cur = con.cursor()
-verifyTables()
-# bootup.insertData() 
+verify_tables()
+# bootup.insertData()
 # baseSet(1,"Fighter","Micron Heavy",cur)
-# thrusters = selectThrusters(BP,shipSize,PCU,cur)
-# shields = selectShields(BP,PCU)
-# fillWeapons(BP,PCU,frameMounts)
-# printValues()
-
-
-
-
-
-
-
-
+# thrusters = select_thrusters(BP,ship_size,PCU,cur)
+# shields = select_shields(BP,PCU)
+# fill_weapons(BP,PCU,frame_mounts)
+# print_values()

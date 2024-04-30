@@ -1,5 +1,5 @@
+"""Contains functions to populate tables for the app."""
 import sqlite3
-
 import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -8,303 +8,210 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 import utilities.sql_interactions as sql
-import raw_data
+import app.raw_data
 
-def insertData():
+def insert_data():
+    """Run a series of bulk inserts based on data from raw_data.py"""
     answer = input("Do you want to populate tables? (Y/N)")
     if answer == 'Y':
         def connect():
             con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
-            return(con)
+            return con
         con = connect()
         cur = con.cursor()
 
-        def insertFrames(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Frame"])+'"'+"'" 
-            for row in raw_data.frameValues:
-                newInsert = 'sql.tableInsert("Frame",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertFrames(cur,con)
+        def insert_frames(cursor,connection):
 
-        def insertFrameMounts(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Frame_Mounts"])+'"'+"'" 
-            for row in raw_data.frameMountValues:
-                newInsert = 'sql.tableInsert("Frame_Mounts",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertFrameMounts(cur,con)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Frame"])+'"'+"'"
+            for row in app.raw_data.frame_values:
+                new_insert = 'sql.tableInsert("Frame",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_frames(cur,con)
 
-        def insertpowerCores(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Power_Core"])+'"'+"'" 
-            for row in raw_data.powerCoreValues:
-                newInsert = 'sql.tableInsert("Power_Core",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertpowerCores(cur,con)
+        def insert_frame_mounts(cursor,connection):
 
-        def insertpowerCoreSize(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Power_Core_Size"])+'"'+"'" 
-            for row in raw_data.powerCoreSizeValues:
-                newInsert = 'sql.tableInsert("Power_Core_Size",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertpowerCoreSize(cur,con)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Frame_Mounts"])+'"'+"'"
+            for row in app.raw_data.frame_mount_values:
+                new_insert = 'sql.tableInsert("Frame_Mounts",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_frame_mounts(cur,con)
 
-        def insertThrusters(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Thrusters"])+'"'+"'" 
-            for row in raw_data.thrusterValues:
-                newInsert = 'sql.tableInsert("Thrusters",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertThrusters(cur,con)
+        def insert_power_cores(cursor,connection):
 
-        def insertSize(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Size"])+'"'+"'" 
-            for row in raw_data.sizeValues:
-                newInsert = 'sql.tableInsert("Size",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertSize(cur,con)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Power_Core"])+'"'+"'"
+            for row in app.raw_data.power_core_values:
+                new_insert = 'sql.tableInsert("Power_Core",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_power_cores(cur,con)
 
-        def insertManeuverability(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Maneuverability"])+'"'+"'" 
-            for row in raw_data.maneuverabilityValues:
-                newInsert = 'sql.tableInsert("Maneuverability",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertManeuverability(cur,con)
+        def insert_power_core_size(cursor,connection):
 
-        def insertTier(cur,con):
-    
-            columns = "'"+'"'+'","'.join(raw_data.tableList["Tier"])+'"'+"'" 
-            for row in raw_data.tierValues:
-                newInsert = 'sql.tableInsert("Tier",'+ columns+',"'+ str(row) +'",cur,con)'
-                # print(newInsert)
-                exec(newInsert)
-        insertTier(cur,con)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Power_Core_Size"])+'"'+"'"
+            for row in app.raw_data.power_core_size_values:
+                new_insert = 'sql.tableInsert("Power_Core_Size",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_power_core_size(cur,con)
 
-insertData()
-        # sql.tableInsert("Frames",'"Name","Size","Maneuverability","HP","DT","CT","Expansion_Bays",\
-        #                 "Minimum_Crew","Maximum_Crew","Cost"',
-        #                 '"Racer",1,5,20,0,4,0,1,1,4',cur,con)
-        # sql.tableInsert("Frames",'"Name","Size","Maneuverability","HP","DT","CT","Expansion_Bays",\
-        #                 "Minimum_Crew","Maximum_Crew","Cost"',
-        #                 '"Interceptor",1,5,30,0,6,0,1,1,6',cur,con)
-        # sql.tableInsert("Frames",'"Name","Size","Maneuverability","HP","DT","CT","Expansion_Bays",\
-        #                 "Minimum_Crew","Maximum_Crew","Cost"',
-        #                 '"Fighter",1,4,35,0,7,0,1,2,8',cur,con)
+        def insert_thrusters(cursor,connection):
 
-        # cur.execute("SELECT * FROM Frames;")
-        # result = cur.fetchall()
-        # print(result)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Thrusters"])+'"'+"'"
+            for row in app.raw_data.thruster_values:
+                new_insert = 'sql.tableInsert("Thrusters",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_thrusters(cur,con)
 
-        # sql.tableInsert("Size",'"size","modifier"','"Tiny",2',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Small",1',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Medium",0',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Large",-1',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Huge",-2',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Gargantuan",-3',cur,con)
-        # sql.tableInsert("Size",'"size","modifier"','"Colossal",-4',cur,con)
+        def insert_size(cursor,connection):
 
-        # cur.execute("SELECT * FROM Size;")
-        # result = cur.fetchall()
-        # print(result)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Size"])+'"'+"'"
+            for row in app.raw_data.size_values:
+                new_insert = 'sql.tableInsert("Size",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_size(cur,con)
 
-        # sql.tableInsert("Maneuverability",'"manueverability","modifier","turn"','"clumsy",-2,4',cur,con)
-        # sql.tableInsert("Maneuverability",'"manueverability","modifier","turn"','"poor",-1,3',cur,con)
-        # sql.tableInsert("Maneuverability",'"manueverability","modifier","turn"','"average",0,2',cur,con)
-        # sql.tableInsert("Maneuverability",'"manueverability","modifier","turn"','"good",1,1',cur,con)
-        # sql.tableInsert("Maneuverability",'"manueverability","modifier","turn"','"perfect",2,0',cur,con)
+        def insert_maneuverability(cursor,connection):
 
-        # cur.execute("SELECT * FROM Maneuverability;")
-        # result = cur.fetchall()
-        # print(result)
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Maneuverability"])+'"'+"'"
+            for row in app.raw_data.maneuverability_values:
+                new_insert = 'sql.tableInsert("Maneuverability",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_maneuverability(cur,con)
 
-        # sql.tableInsert("Frame_Mounts",'"frame_id","arc","weight","count"',
-        #                 '1,"Forward","Light",1' ,cur,con)
-        # sql.tableInsert("Frame_Mounts",'"frame_id","arc","weight","count"',
-        #                 '1,"Aft","Light",1' ,cur,con)    
-        # sql.tableInsert("Frame_Mounts",'"frame_id","arc","weight","count"',
-        #                 '2,"Forward","Light",2' ,cur,con)
-        # sql.tableInsert("Frame_Mounts",'"frame_id","arc","weight","count"',
-        #                 '3,"Forward","Light",2' ,cur,con)
-        # sql.tableInsert("Frame_Mounts",'"frame_id","arc","weight","count"',
-        #                 '3,"Aft","Light",1' ,cur,con)
-        
+        def insert_tier(cursor,connection):
 
+            columns = "'"+'"'+'","'.join(app.raw_data.table_list["Tier"])+'"'+"'"
+            for row in app.raw_data.tier_values:
+                new_insert = 'sql.tableInsert("Tier",'+ columns+',"'+ str(row) +'",cursor,connection)'
+                # print(new_insert)
+                exec(new_insert)
+        insert_tier(cur,con)
 
-
-        # cur.execute("SELECT * FROM Frame_Mounts;")
-        # result = cur.fetchall()
-        # print(result)
-
-        # sql.tableInsert("Power_Cores",'"Name","PCU","Cost"',
-        #                 '"Micron Light",50,4',cur,con)
-        # sql.tableInsert("Power_Cores",'"Name","PCU","Cost"',
-        #                 '"Micron Heavy",70,6',cur,con)
-        # sql.tableInsert("Power_Cores",'"Name","PCU","Cost"',
-        #                 '"Micron Ultra",80,8',cur,con)
-        # sql.tableInsert("Power_Cores",'"Name","PCU","Cost"',
-        #                 '"Arcus Light",75,7',cur,con)
-
-        # cur.execute("SELECT * FROM Power_Cores;")
-        # result = cur.fetchall()
-        # print(result)
-
-        # sql.tableInsert("Power_Core_Size",'"Power_Core_id","Size"',
-        #                 '1,1',cur,con)
-        # sql.tableInsert("Power_Core_Size",'"Power_Core_id","Size"',
-        #                 '2,1',cur,con)
-        # sql.tableInsert("Power_Core_Size",'"Power_Core_id","Size"',
-        #                 '3,1',cur,con)
-        # sql.tableInsert("Power_Core_Size",'"Power_Core_id","Size"',
-        #                 '4,1',cur,con)
-        # sql.tableInsert("Power_Core_Size",'"Power_Core_id","Size"',
-        #                 '4,2',cur,con)
-
-        # cur.execute("SELECT * FROM Power_Core_Size;")
-        # result = cur.fetchall()
-        # print(result)
-
-        # sql.tableInsert("Thrusters",'"Name","Size","Speed","Piloting_Modifier","PCU","Cost"',
-        #                 '"T6",1,6,1,20,3',cur,con)
-        # sql.tableInsert("Thrusters",'"Name","Size","Speed","Piloting_Modifier","PCU","Cost"',
-        #                 '"T8",1,8,0,25,4',cur,con)
-        # sql.tableInsert("Thrusters",'"Name","Size","Speed","Piloting_Modifier","PCU","Cost"',
-        #                 '"T10",1,10,0,30,5',cur,con)
-
-        # cur.execute("SELECT * FROM Thrusters;")
-        # result = cur.fetchall()
-        # print(result)
+insert_data()
 
         # sql.tableInsert("Armor",'"Name","Bonus_to_AC","Special","Cost"',
-        #                 '"MK1",1,0,"Frame.Size * 1"',cur,con)
+        #                 '"MK1",1,0,"Frame.Size * 1"',cursor,connection)
         # sql.tableInsert("Armor",'"Name","Bonus_to_AC","Special","Cost"',
-        #                 '"MK2",2,0,"Frame.Size * 2"',cur,con)
+        #                 '"MK2",2,0,"Frame.Size * 2"',cursor,connection)
         # sql.tableInsert("Armor",'"Name","Bonus_to_AC","Special","Cost"',
-        #                 '"MK3",3,0,"Frame.Size * 3"',cur,con)
+        #                 '"MK3",3,0,"Frame.Size * 3"',cursor,connection)
 
         # cur.execute("SELECT * FROM Armor;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Computer",'"Name","Bonus","Nodes","PCU","Cost"',
-        #                 '"Basic",0,0,0,0',cur,con)
+        #                 '"Basic",0,0,0,0',cursor,connection)
         # sql.tableInsert("Computer",'"Name","Bonus","Nodes","PCU","Cost"',
-        #                 '"Mk1 Mononode",1,1,10,1',cur,con)
+        #                 '"Mk1 Mononode",1,1,10,1',cursor,connection)
         # sql.tableInsert("Computer",'"Name","Bonus","Nodes","PCU","Cost"',
-        #                 '"Mk1 Duonode",1,2,10,2',cur,con)
+        #                 '"Mk1 Duonode",1,2,10,2',cursor,connection)
         # sql.tableInsert("Computer",'"Name","Bonus","Nodes","PCU","Cost"',
-        #                 '"Mk1 Trinode",1,3,10,3',cur,con)
+        #                 '"Mk1 Trinode",1,3,10,3',cursor,connection)
 
         # cur.execute("SELECT * FROM Computer;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Defensive_Countermeasures",'"Name","Bonus_to_TL","PCU","Cost"',
-        #                 '"Mk1 Defenses",1,1,2',cur,con)
+        #                 '"Mk1 Defenses",1,1,2',cursor,connection)
         # sql.tableInsert("Defensive_Countermeasures",'"Name","Bonus_to_TL","PCU","Cost"',
-        #                 '"Mk2 Defenses",2,1,3',cur,con)
+        #                 '"Mk2 Defenses",2,1,3',cursor,connection)
         # sql.tableInsert("Defensive_Countermeasures",'"Name","Bonus_to_TL","PCU","Cost"',
-        #                 '"Mk3 Defenses",3,2,4',cur,con)
+        #                 '"Mk3 Defenses",3,2,4',cursor,connection)
 
         # cur.execute("SELECT * FROM Defensive_Countermeasures;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Drift_Engines",'"Name","Engine_Rating","PCU","Max_Size","Cost"',
-        #                 '"Signal Basic",1,75,7,"Frame.size *2"',cur,con)
+        #                 '"Signal Basic",1,75,7,"Frame.size *2"',cursor,connection)
         # sql.tableInsert("Drift_Engines",'"Name","Engine_Rating","PCU","Max_Size","Cost"',
-        #                 '"Signal Booster",2,100,5,"Frame.size *5"',cur,con)
+        #                 '"Signal Booster",2,100,5,"Frame.size *5"',cursor,connection)
         # sql.tableInsert("Drift_Engines",'"Name","Engine_Rating","PCU","Max_Size","Cost"',
-        #                 '"Signal Major",3,150,4,"Frame.size *10"',cur,con)
+        #                 '"Signal Major",3,150,4,"Frame.size *10"',cursor,connection)
         # sql.tableInsert("Drift_Engines",'"Name","Engine_Rating","PCU","Max_Size","Cost"',
-        #                 '"Signal Superior",4,175,4,"Frame.size *15"',cur,con)
+        #                 '"Signal Superior",4,175,4,"Frame.size *15"',cursor,connection)
         # sql.tableInsert("Drift_Engines",'"Name","Engine_Rating","PCU","Max_Size","Cost"',
-        #                 '"Signal Ultra",5,200,3,"Frame.size *20"',cur,con)
+        #                 '"Signal Ultra",5,200,3,"Frame.size *20"',cursor,connection)
 
         # cur.execute("SELECT * FROM Drift_Engines;")
         # result = cur.fetchall()
         # print(result)
 
-        # sql.tableInsert("Security",'"Name","Cost"','"Anti-hacking Systems",3',cur,con)
-        # sql.tableInsert("Security",'"Name","Cost"','"Antipersonnel weapon (heavy)","5 + item level of weapon"',cur,con)
-        # sql.tableInsert("Security",'"Name","Cost"','"Antipersonnel weapon (longarm)","item level of weapon"',cur,con)
-        # sql.tableInsert("Security",'"Name","Cost"','"Biometric Locks",5',cur,con)
-        # sql.tableInsert("Security",'"Name","Cost"','"Computer countermeasures","tier of computer"',cur,con)
-        # sql.tableInsert("Security",'"Name","Cost"','"Self-destruct system","Frame.size *5"',cur,con)
+        # sql.tableInsert("Security",'"Name","Cost"','"Anti-hacking Systems",3',cursor,connection)
+        # sql.tableInsert("Security",'"Name","Cost"','"Antipersonnel weapon (heavy)","5 + item level of weapon"',cursor,connection)
+        # sql.tableInsert("Security",'"Name","Cost"','"Antipersonnel weapon (longarm)","item level of weapon"',cursor,connection)
+        # sql.tableInsert("Security",'"Name","Cost"','"Biometric Locks",5',cursor,connection)
+        # sql.tableInsert("Security",'"Name","Cost"','"Computer countermeasures","tier of computer"',cursor,connection)
+        # sql.tableInsert("Security",'"Name","Cost"','"Self-destruct system","Frame.size *5"',cursor,connection)
 
         # cur.execute("SELECT * FROM Security;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Sensors",'"Name","Range","Modifier","Cost"',
-        #                 '"Cut-rate","Short(5)",-2,1',cur,con)
+        #                 '"Cut-rate","Short(5)",-2,1',cursor,connection)
         # sql.tableInsert("Sensors",'"Name","Range","Modifier","Cost"',
-        #                 '"Budget Short-range","Short(5)",0,2',cur,con)
+        #                 '"Budget Short-range","Short(5)",0,2',cursor,connection)
         # sql.tableInsert("Sensors",'"Name","Range","Modifier","Cost"',
-        #                 '"Basic Short-range","Short(5)",2,3',cur,con)
+        #                 '"Basic Short-range","Short(5)",2,3',cursor,connection)
 
         # cur.execute("SELECT * FROM Sensors;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Shields",'"Name","Total_SP","Regen","PCU","Cost"',
-        #                 '"Basic Shields 10",10,"1/min",5,2',cur,con)
+        #                 '"Basic Shields 10",10,"1/min",5,2',cursor,connection)
         # sql.tableInsert("Shields",'"Name","Total_SP","Regen","PCU","Cost"',
-        #                 '"Basic Shields 20",20,"1/min",10,3',cur,con)
+        #                 '"Basic Shields 20",20,"1/min",10,3',cursor,connection)
         # sql.tableInsert("Shields",'"Name","Total_SP","Regen","PCU","Cost"',
-        #                 '"Basic Shields 30",30,"1/min",15,4',cur,con)
+        #                 '"Basic Shields 30",30,"1/min",15,4',cursor,connection)
 
         # cur.execute("SELECT * FROM Shields;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Weapons",'"Name","Weight","Range","Speed","Damage","PCU","Special","Cost"',
-        #                 '"Chain Cannon","Light","Short(5)",0,"6d4",15,1,10',cur,con)
+        #                 '"Chain Cannon","Light","Short(5)",0,"6d4",15,1,10',cursor,connection)
         # sql.tableInsert("Weapons",'"Name","Weight","Range","Speed","Damage","PCU","Special","Cost"',
-        #                 '"Grazer","Heavy","Short(5)",0,"7d10",40,2,35',cur,con)
+        #                 '"Grazer","Heavy","Short(5)",0,"7d10",40,2,35',cursor,connection)
         # sql.tableInsert("Weapons",'"Name","Weight","Range","Speed","Damage","PCU","Special","Cost"',
-        #                 '"Gravity Cannon","Capital","Long(20)",0,"2d6*10",40,3,50',cur,con)
+        #                 '"Gravity Cannon","Capital","Long(20)",0,"2d6*10",40,3,50',cursor,connection)
         # sql.tableInsert("Weapons",'"Name","Weight","Range","Speed","Damage","PCU","Special","Cost"',
-        #                 '"Coil Gun","Light","Long(20)",0,"4d4",10,0,10',cur,con)        
+        #                 '"Coil Gun","Light","Long(20)",0,"4d4",10,0,10',cursor,connection)
         # sql.tableInsert("Weapons",'"Name","Weight","Range","Speed","Damage","PCU","Special","Cost"',
-        #                 '"Flak Thrower","Light","Short(5)",0,"3d4",10,6,5',cur,con)
-        
+        #                 '"Flak Thrower","Light","Short(5)",0,"3d4",10,6,5',cursor,connection)
+
         # cur.execute("SELECT * FROM Weapons;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Expansion_Bays",'"Name","PCU","Cost"',
-        #                 '"Arcane Laboratory",1,1',cur,con)
+        #                 '"Arcane Laboratory",1,1',cursor,connection)
         # sql.tableInsert("Expansion_Bays",'"Name","PCU","Cost"',
-        #                 '"Cargo Hold",0,0',cur,con)
+        #                 '"Cargo Hold",0,0',cursor,connection)
         # sql.tableInsert("Expansion_Bays",'"Name","PCU","Cost"',
-        #                 '"Escape Pods",2,1',cur,con)
+        #                 '"Escape Pods",2,1',cursor,connection)
 
         # cur.execute("SELECT * FROM Expansion_Bays;")
         # result = cur.fetchall()
         # print(result)
 
         # sql.tableInsert("Tier",'"Tier","Build_Points"',
-        #             '0.25,25',cur,con)
+        #             '0.25,25',cursor,connection)
         # sql.tableInsert("Tier",'"Tier","Build_Points"',
-        #             '0.33,30',cur,con)
+        #             '0.33,30',cursor,connection)
         # sql.tableInsert("Tier",'"Tier","Build_Points"',
-        #             '0.5,40',cur,con)
+        #             '0.5,40',cursor,connection)
         # sql.tableInsert("Tier",'"Tier","Build_Points"',
-        #             '1,55',cur,con)
-        
+        #             '1,55',cursor,connection)
+
         # cur.execute("SELECT * FROM Tier;")
         # result = cur.fetchall()
-        # print(result)    
-
-
+        # print(result)
