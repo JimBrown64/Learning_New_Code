@@ -1,5 +1,5 @@
-
-tableList = {'Frame':[
+"""list of tables and values to be stored in them. Planning to replace with JSON at a later time."""
+table_list = {'Frame':[
                         'Name', 
                         'Size', 
                         'Maneuverability', 
@@ -99,7 +99,7 @@ tableList = {'Frame':[
 
 
 
-frameValues =[
+frame_values =[
     "'Racer',1,5,20,0,4,0,1,1,4",
     "'Interceptor',1,5,30,0,6,0,1,1,6",
     "'Fighter',1,4,35,0,7,0,1,2,8",
@@ -118,7 +118,7 @@ frameValues =[
 
 
 
-frameMountValues = [
+frame_mount_values = [
     "1,'Forward','Light',1",
     "1,'Aft','Light',1",
     "2,'Forward','Light',2",
@@ -174,7 +174,7 @@ frameMountValues = [
     "14,'Turret','Light',4"
 ]
 
-powerCoreValues = [
+power_core_values = [
     "'Micron Light',50,4",
     "'Micron Heavy',70,6",
     "'Micron Ultra',80,8",
@@ -199,7 +199,7 @@ powerCoreValues = [
     "'Gateway Ultra',500,50"
 ]
 
-powerCoreSizeValues = [
+power_core_size_values = [
     "1,1",
     "2,1",
     "3,1",
@@ -258,7 +258,7 @@ powerCoreSizeValues = [
     "22,6"
 ]
 
-thrusterValues=[ 
+thruster_values=[
     "'T6',1,6,1,20,3",
     "'T8',1,8,0,25,4",
     "'T10',1,10,0,30,5",
@@ -289,7 +289,7 @@ thrusterValues=[
     "'C8',7,8,0,400,16"
 ]
 
-sizeValues = [
+size_values = [
     "'Tiny',2",
     "'Small',1",
     "'Medium',0",
@@ -299,7 +299,7 @@ sizeValues = [
     "'Colossal',-8"
 ]
 
-maneuverabilityValues = [
+maneuverability_values = [
     "'Clumsy',-2,4",
     "'Poor',-1,3",
     "'Average',0,2",
@@ -307,7 +307,7 @@ maneuverabilityValues = [
     "'Perfect',2,0"
 ]
 
-tierValues = [
+tier_values = [
     ".25,25",
     ".3,30",
     ".5,40",
