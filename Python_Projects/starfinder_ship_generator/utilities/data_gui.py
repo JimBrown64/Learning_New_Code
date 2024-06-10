@@ -1,42 +1,55 @@
 import tkinter as tk
 import sql_interactions as sql
 import sqlite3
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
 
+from app.sql_statement_placeholder import query_construction as statement
 
 table = "Tier"
 columns = []
-alt_Statement = ""
+COND = """tier.tier = 1
+            AND frame.Maximum_crew >= 4
+            AND mount_quantity > 1
+            AND remaining_bp > 25
+            AND power_core.PCU > 100"""
+alt_Statement = statement(COND)#"SELECT * FROM thrusters;"
 # alt_Statement = "SELECT * FROM frame_mounts WHERE frame_id = 3"
-alt_Statement = "SELECT  tier.build_points AS BP, \
-                    Frame.name,size.size, \
-                    mount_totals.weight AS mount_weight, mount_totals.mount_count AS mount_quantity, \
-                    maneuverability.maneuverability, \
-                    frame.expansion_bays, \
-                    power_core.name AS power_core_name, power_core.pcu, \
-                    thrusters.name AS thruster_name, \
-                    (tier.build_points - Frame.cost - power_core.cost - thrusters.cost) AS remaining_bp\
-                FROM Frame \
-                JOIN (SELECT SUM(frame_mounts.count) AS mount_count,frame_mounts.weight,frame_mounts.frame_id \
-                     FROM frame_mounts \
-                     GROUP BY frame_mounts.frame_id,frame_mounts.weight)AS mount_totals ON Frame.id = mount_totals.frame_id \
-                JOIN maneuverability ON Frame.maneuverability = maneuverability.id \
-                JOIN Tier ON Frame.Cost < Tier.Build_Points \
-                JOIN size ON Frame.size = size.id \
-                JOIN power_core ON power_core.id = power_core_size.power_core_id \
-                JOIN power_core_size ON Frame.size = power_core_size.size \
-                JOIN thrusters ON Frame.size = thrusters.size \
-                WHERE tier.tier = 1 \
-                    AND frame.Maximum_crew >= 4 \
-                    AND mount_quantity > 1 \
-                    AND remaining_bp > 25 \
-                    AND power_core.PCU > 100 \
-                ;"
+# alt_Statement = "SELECT  tier.build_points AS BP, \
+#                     Frame.name,size.size, \
+#                     mount_totals.weight AS mount_weight, mount_totals.mount_count AS mount_quantity, \
+#                     maneuverability.maneuverability, \
+#                     frame.expansion_bays, \
+#                     power_core.name AS power_core_name, power_core.pcu, \
+#                     thrusters.name AS thruster_name, \
+#                     (tier.build_points - Frame.cost - power_core.cost - thrusters.cost) AS remaining_bp\
+#                 FROM Frame \
+#                 JOIN (SELECT SUM(frame_mounts.count) AS mount_count,frame_mounts.weight,frame_mounts.frame_id \
+#                      FROM frame_mounts \
+#                      GROUP BY frame_mounts.frame_id,frame_mounts.weight)AS mount_totals ON Frame.id = mount_totals.frame_id \
+#                 JOIN maneuverability ON Frame.maneuverability = maneuverability.id \
+#                 JOIN Tier ON Frame.Cost < Tier.Build_Points \
+#                 JOIN size ON Frame.size = size.id \
+#                 JOIN power_core ON power_core.id = power_core_size.power_core_id \
+#                 JOIN power_core_size ON Frame.size = power_core_size.size \
+#                 JOIN thrusters ON Frame.size = thrusters.size \
+#                 WHERE tier.tier = 1 \
+#                     AND frame.Maximum_crew >= 4 \
+#                     AND mount_quantity > 1 \
+#                     AND remaining_bp > 25 \
+#                     AND power_core.PCU > 100 \
+#                 ;"
 
 def connect():
     con = sqlite3.connect('python_projects/starfinder_ship_generator/app.db')
     return con
 
-class mainFrame(): #class used to create the main window, with primary needed functions attached
+class mainFrame(): 
+    """class used to create the main window, with primary needed functions attached"""
     def __init__(self, root):
         self.root = root
         self.mainframe = tk.Frame(self.root)

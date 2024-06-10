@@ -1,16 +1,41 @@
+update as of 05/24/2024
+
+- Adjusted plan to generate list of possibly compatible ship combinations based on conditions in SQL
+    - Query pulls together:
+        - Tier
+        - Frame
+        - power core
+        - thrusters
+    - Components are matched based on compatibilities:
+        - Size
+        - Power requirement/allotment
+        - Tier (Build point allotment)
+    - Conditions may include (but not limited to):
+        - Tier (would dictate amount of BP available)
+        - Crew allotment (for example, If there are 4 players, would need to filter for 4+ crew allotment)
+        - Minimum remaining PCU or BP (as this query does not cover ALL parts, just the core ones, there needs to
+            be adequate resources remaining to finish out the ship)
+
+- App will utilize AI to select a ship off of this list based on requirements
+    - example, input of 'battleship' should generate a ship with a focus on combat, whereas an input of 
+        freighter would prioritize number of cargo holds.
+    - current plan is to take values of ships generated in SQL and convert them into a value on a scale of 
+        -1 through +1 based on if a given statistic for the ship is above or below the average for the 
+        given component based on the returned ships presented.
 
 
+----ORIGINAL---
 - Build App To take a Tier, Frame, and Power Core and have it select all the other parts
     - Base level:
         - Build a function That takes in the Tier, Frame, and Power Core
             - Strip Build Points From Tier and store it in a variable
             - Strip Size and Cost from Frame
                 - Use Frame id to gather Frame Mounts
-                - Function should deduct Cost Build Points from the total Alotment of BP
+                - Function should deduct Cost Build Points from the total allotment of BP
             - Strip Size, Cost and PCU from Power core
                 - Function Should confirm the Size of the Power Core is appropriate for the size of the Frame, 
                     if not, throw an error.
-                - Function should deduct Cost Build Points from the total alotment of BP
+                - Function should deduct Cost Build Points from the total allotment of BP
 
         - Build a function that takes in remaining Build Points, Size, and remaining PCU
             - should select thrusters of an appropriate size and power requirement in relation to Frame.Size and   
