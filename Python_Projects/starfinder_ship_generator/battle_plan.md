@@ -1,3 +1,18 @@
+update as of 07/10/2024
+
+- Ai should: 
+    - take in an input ("battleship")
+    - take in list of "answers" (the ships generated in the list)
+    - assess based on Q-values which of the ANSWERS would be a proper fit in relation to the INPUT
+        - Q-values would contain:
+            - input
+            - answer 
+            - reward
+    - NOTE: can use    "ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS row_index," in the SELECT
+        statement to label each row with an index (makes recalling the correct row easier) 
+
+
+
 update as of 05/24/2024
 
 - Adjusted plan to generate list of possibly compatible ship combinations based on conditions in SQL

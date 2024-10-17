@@ -8,6 +8,7 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 import app.raw_data
+import app.starship_selection_ai as ai
 from app.sql_statement_placeholder import query_construction as statement
 import utilities.sql_interactions as sql
 
@@ -107,6 +108,8 @@ COND = """tier.tier = 1
 verify_tables()
 data_set = CollectedData(COND,cur)
 data_set.assign()
+agent = ai.agent
+agent.actions = data_set.converted_values
 print("ship collection: ",data_set.ship_collection[0])
 print("collected averages: ", data_set.stat_averages)
 print("converted values: ",data_set.converted_values[0])
