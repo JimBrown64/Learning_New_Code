@@ -1,0 +1,16 @@
+
+
+body{
+    color: #F12309;
+    text-align: center;
+}
+
+p{
+    color: aqua;
+    text-align: left;
+}
+
+::placeholder{
+    color: lightgray;
+    font-style: italic;
+}
