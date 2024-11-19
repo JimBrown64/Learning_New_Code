@@ -27,6 +27,7 @@ def tableQuery(table, target, conditions, cur): #returns the result of the query
             query =  "SELECT "+ target + " FROM " + table 
         else:
             query = "SELECT " + target + " FROM " + table + " WHERE " + conditions 
+            print(query)
         cur.execute(query)
         result = cur.fetchall()
         return result
@@ -64,7 +65,7 @@ def tableInsert(table, columns, values, cur, con): #inserts new row into {table}
 
 def tableConstructor(tableName, cur, con, columns): #creates a table called {tableName} with columns {columns}
     try:
-        tableConstruction = "CREATE TABLE " + tableName + " (id, " + columns + ")"
+        tableConstruction = "CREATE TABLE " + tableName + " ('id' INTEGER PRIMARY KEY AUTOINCREMENT," + columns + ")"
         cur.execute(tableConstruction)
         con.commit()
     except ValueError as error:
