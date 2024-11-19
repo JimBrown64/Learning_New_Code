@@ -1,0 +1,5 @@
+This application is intended to simplify running the tabletop game "Starfinder" by handling one of the more tedious points, creating non-player controlled ships. 
+
+This will also serve the purpose of offering an opportunity to build and service a more complex data structure as well as work towards bettering Python practices. 
+
+The intended final product will be meant to take in very limited information, and provide a full set of components needed for the game. The goal is to start from a random selection process and then move to the utilization of AI (presently planning on using a reinforcment learning framework) to build more optimal ships given the inputs provided. For a GUI, either Django or JavaScript will be utilized. This will either offer an opportunity to learn the use of Django or it can serve as a chance to brush up, and improve upon Javascript skills. 
