@@ -16,4 +16,13 @@ public class DataBaseConnection{
             }    
         }
     }
+
+    public void disconnect(){
+        try{
+            connection.close();
+            System.out.println("Connection closed.");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
