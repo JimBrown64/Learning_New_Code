@@ -21,8 +21,36 @@ public class DataBaseConnection{
         try{
             connection.close();
             System.out.println("Connection closed.");
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
         }
     }
+
+    public StringBuilder query(String inputQuery){
+        StringBuilder output = new StringBuilder("");
+        ResultSet results = null;
+        ResultSetMetaData metaData = null;
+        try{
+            Statement statement = connection.createStatement();
+            results = statement.executeQuery(inputQuery);
+            metaData = results.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            for(int i  = 1; i <= columnCount; i++){
+                output.append(metaData.getColumnName(i) + "\t");
+            }
+            output.append("\n");
+            while(results.next()){
+                for(int i = 1; i <= columnCount; i++){
+                    output.append(results.getString(i) + "\t");
+                }
+                output.append("\n");
+            }
+            System.out.println(output);
+        }catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
 }
+
