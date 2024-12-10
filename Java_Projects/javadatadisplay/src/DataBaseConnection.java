@@ -26,8 +26,8 @@ public class DataBaseConnection{
         }
     }
 
-    public StringBuilder query(String inputQuery){
-        StringBuilder output = new StringBuilder("");
+    public String query(String inputQuery){
+        StringBuilder outputStart = new StringBuilder("");
         ResultSet results = null;
         ResultSetMetaData metaData = null;
         try{
@@ -37,19 +37,19 @@ public class DataBaseConnection{
             int columnCount = metaData.getColumnCount();
 
             for(int i  = 1; i <= columnCount; i++){
-                output.append(metaData.getColumnName(i) + "\t");
+                outputStart.append(metaData.getColumnName(i) + "\t");
             }
-            output.append("\n");
+            outputStart.append("\n");
             while(results.next()){
                 for(int i = 1; i <= columnCount; i++){
-                    output.append(results.getString(i) + "\t");
+                    outputStart.append(results.getString(i) + "\t");
                 }
-                output.append("\n");
+                outputStart.append("\n");
             }
-            System.out.println(output);
         }catch(SQLException e) {
             e.printStackTrace();
         }
+        String output = outputStart.toString();
         return output;
     }
 }
