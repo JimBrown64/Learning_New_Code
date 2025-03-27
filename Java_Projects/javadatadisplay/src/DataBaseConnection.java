@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseConnection{
     Connection connection = null;
@@ -26,31 +28,54 @@ public class DataBaseConnection{
         }
     }
 
-    public String query(String inputQuery){
-        StringBuilder outputStart = new StringBuilder("");
+    public Object[][] query(String inputQuery){
+        // StringBuilder outputStart = new StringBuilder("");
         ResultSet results = null;
         ResultSetMetaData metaData = null;
+        Object[][] returnObj = null;       
         try{
-            Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement(
+                // ResultSet.TYPE_SCROLL_INSENSITIVE,
+                // ResultSet.CONCUR_READ_ONLY
+            );
             results = statement.executeQuery(inputQuery);
             metaData = results.getMetaData();
             int columnCount = metaData.getColumnCount();
-
-            for(int i  = 1; i <= columnCount; i++){
-                outputStart.append(metaData.getColumnName(i) + "\t");
+            String[] columnHeaders = new String[columnCount];
+            for(int i  = 1; i <= columnCount; i++){ //populate columnNames
+                columnHeaders[i-1] = metaData.getColumnName(i);
             }
-            outputStart.append("\n");
+            // int rowCount = 0;
+            // while(results.next()){
+            //     rowCount++;
+            // }
+            // results.beforeFirst();
+            
+            // Object[][] data = new Object[rowCount][columnCount];
+            List<Object[]> dataList = new ArrayList<>();
+    
+            // System.out.println("debugger");
             while(results.next()){
+                // System.out.println("debugger");
                 for(int i = 1; i <= columnCount; i++){
-                    outputStart.append(results.getString(i) + "\t");
+                    String[] tempObj = new String[columnCount];
+                    tempObj[columnCount-1] = results.getString(i);
+                    // System.out.println("this is when its input!" + tempObj[columnCount-1]);
+                    dataList.add(new Object[]{tempObj});
+
                 }
-                outputStart.append("\n");
             }
+            Object[] testRow = dataList.get(0);
+            Object testTestRow = testRow[0];
+            System.out.println(testRow[0]);
+            // System.out.println("debugger");
+            Object[][] data = dataList.toArray(new Object[0][0]);
+            returnObj = new Object[][]{columnHeaders,data};
         }catch(SQLException e) {
             e.printStackTrace();
         }
-        String output = outputStart.toString();
-        return output;
+        return returnObj;
+        // String output = outputStart.toString();
     }
 }
 
