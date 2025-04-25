@@ -9,6 +9,10 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 from utilities import sql_interactions as sql,gui
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+icon_path = os.path.join(script_dir, "logo.png")
+
+bgcolor = 'light gray'
 
 
 def connect():
@@ -26,18 +30,25 @@ def verify_tables(cursor,connection):
             print("table confirmed.")
 
 
+
+
+
+
 con = connect()
 cur = con.cursor()
 verify_tables(cur,con)
+table_names = [row[0] for row in sql.tableQuery("sqlite_master","name","type = 'table'",cur)]
+print(table_names)
+root = tk.Tk()
+root.title('DM Buddy')
+icon = tk.PhotoImage(file=icon_path)  # Ensure the file path is correct
+root.iconphoto(True, icon)  # Apply the icon to the window
+mf = gui.MainFrame(root)
+# dropdown_frame = gui.TileFrame(mf,1,1,1,tk.FLAT,bgcolor)
+# dropdown_frame.create_dropdown(table_names,1,1,'derp')
+# form = gui.NewWindow(root,bgcolor)
+form = gui.TileFrame(mf,1,1,1,tk.FLAT,bgcolor)
+form.new_entry_field(1,"test")
+form.new_button("Save",3,3)
 
-# root = tk.Tk()
-# gui.loadRoot(root)
-# root.geometry("600x300")
-# root.title("House Finance Tracker")
-# mf = gui.mainFrame(root)
-# mf.menuBar()
-# gui.loadMainframe(mf)
-# gui.headerRow(mf.mainframe)
-# gui.generateTiles(mf.mainframe)
-
-# root.mainloop()
+root.mainloop()

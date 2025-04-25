@@ -17,63 +17,51 @@ if parent_dir not in sys.path:
 import tkinter as tk
 from tkinter import ttk
 
-def display_data():
-    # Simulated data from an SQL database (list of tuples)
-    data = [
-        (1, "Alice", "Engineer"),
-        (2, "Bob", "Designer"),
-        (3, "Charlie", "Manager"),
-    ]
+class TabbedWindow:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Vertical Tabs Example")
+        self.root.geometry("500x400")
 
-    # Clear existing data in the treeview
-    for row in tree.get_children():
-        tree.delete(row)
+        # Create a custom style for larger and left-side tabs
+        style = ttk.Style()
+        style.configure("TNotebook", tabposition="wn")  # 'w' = Left, 'n' = Top alignment
+        style.configure("TNotebook.Tab", padding=(20, 10), font=("Arial", 12))  # Increase tab size
 
-    # Insert new data into the treeview
-    for row in data:
-        tree.insert("", tk.END, values=row)
+        # Create the Notebook (Tab Container)
+        self.notebook = ttk.Notebook(root)
+        self.notebook.pack(expand=True, fill="both")
 
-# Create main window
-root = tk.Tk()
-root.title("SQL Table Display")
-root.geometry("400x300")
+        # Create Tabs
+        self.create_tabs()
 
-# Create a frame to hold the table
-frame = tk.Frame(root)
-frame.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
+    def create_tabs(self):
+        """Creates tabs in the Notebook"""
+        # Tab 1
+        self.tab1 = tk.Frame(self.notebook)
+        self.notebook.add(self.tab1, text="Tab 1")
+        self.setup_tab(self.tab1, "This is Tab 1")
 
-# Define table columns
-columns = ("ID", "Name", "Role")
+        # Tab 2
+        self.tab2 = tk.Frame(self.notebook)
+        self.notebook.add(self.tab2, text="Tab 2")
+        self.setup_tab(self.tab2, "This is Tab 2")
 
-# Create Treeview widget
-tree = ttk.Treeview(frame, columns=columns, show="headings")
+        # Tab 3
+        self.tab3 = tk.Frame(self.notebook)
+        self.notebook.add(self.tab3, text="Tab 3")
+        self.setup_tab(self.tab3, "This is Tab 3")
 
-# Define column headings
-for col in columns:
-    tree.heading(col, text=col)  # Set column headings
-    tree.column(col, anchor="center", width=100)  # Center text and set width
+    def setup_tab(self, tab, text):
+        """Sets up content for each tab"""
+        label = tk.Label(tab, text=text, font=("Arial", 12))
+        label.pack(pady=20)
 
-# Add a scrollbar
-scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-tree.configure(yscroll=scrollbar.set)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-# Pack the table
-tree.pack(fill=tk.BOTH, expand=True)
-
-# Button to refresh data
-btn_refresh = tk.Button(root, text="Load Data", command=display_data)
-btn_refresh.pack(pady=5)
-
-# Run the Tkinter event loop
-root.mainloop()
-
-
-
-
-
-
-
+# Run the Tkinter application
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TabbedWindow(root)
+    root.mainloop()
 
 
 

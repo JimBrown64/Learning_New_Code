@@ -1,3 +1,6 @@
+"""used to unit test"""
+
+
 import tkinter as tk
 import sys
 import os
@@ -42,3 +45,7 @@ tileFrame.create_table(baseX,baseY,['Column1'],faux_table)
 #     gui.new_label(testFrame, item,baseX,2,bgcolor,0)
 #     baseX+=1
 root.mainloop()
+
+
+
+# SELECT name FROM sqlite_master WHERE type = 'table' order by name

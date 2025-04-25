@@ -54,12 +54,6 @@ class MainFrame():
             else:
                 self.canvas.yview_scroll(1, "units")  # Scroll down
 
-    def add_form(self):
-        form_window=self.New_Window()
-        form_frame=TileFrame(form_window,420,1,1)
-        form_frame.new_entry_field(1,"test")
-        form_frame.new_button("Save",3,3)
-
     def menu_bar(self):
         """adds a menubar to the frame"""
         root = self.root
@@ -69,38 +63,34 @@ class MainFrame():
         viewmenu = tk.Menu(menubar,tearoff= 0)
         # sortmenu = tk.Menu(viewmenu,tearoff= 0)
         menubar.add_cascade(label = "File", menu = filemenu)
-        filemenu.add_command(label = "New Entry...",command= self.add_form)
+        filemenu.add_command(label = "New Row...")#, \
                             # command = lambda :addRow(globals()["table"],\
                             #                         globals()["cur"],\
                             #                         globals()["con"],\
                             #                         globals()["root"],\
                             #                         self.frame))
-        # filemenu.add_command(label = "Delete Rows")
+        filemenu.add_command(label = "Delete Rows")
         #, command = lambda :deleteSelected(self.frame))
         menubar.add_cascade(label= "Edit", menu = editmenu)
-        # editmenu.add_command(label = "New Column")#, command = addColumn)
-        # editmenu.add_command(label = "Edit Row")#, command = editRow)
+        editmenu.add_command(label = "New Column")#, command = addColumn)
+        editmenu.add_command(label = "Edit Row")#, command = editRow)
         menubar.add_cascade(label= "View")#, menu= viewmenu)
         viewmenu.add_cascade(label = "Sort By...")#, menu = sortmenu)
         root.config(menu = menubar)
 
-    def New_Window(self):
-        self.window = tk.Toplevel(self.root)
-        self.frame = TileFrame(self.window,999,1,1,tk.FLAT)
-
 class TileFrame():
     """Class used to create segments of information to display"""
-    def __init__(self,parent,tile_id,cordy,cordx,border=None,color=None):
+    def __init__(self,parent,tile_id,cordy,cordx,border,color):
         #border options:
         #FLAT	No border.
         #RAISED	Appears raised (like a button).
         #SUNKEN	Appears sunken into the UI.
         #GROOVE	Creates a grooved (indented) border.
         #RIDGE	Creates a ridged (raised and lowered) border.
-        self.parent = parent
+        self.parent = parent.frame
         self.id = tile_id
         self.color = color
-        self.frame = tk.Frame(self.parent.frame, bd = 4, relief=border,bg=self.color)
+        self.frame = tk.Frame(self.parent, bd = 4, relief=border,bg=self.color)
         self.frame.grid(column= cordx, row= cordy,padx=5,pady=5)
         self.checkbox_var = tk.BooleanVar()#defaults false
         self.selection = parent.selection
@@ -154,20 +144,15 @@ class TileFrame():
     def on_select(self,func):
         """utility that takes in a specific case function and applies it to the display"""
         try:
-            print(func)
-        except Exception as error:
-            print("error in on_select: " + error)
+            func()
+        except ValueError as error:
+            print("error in on_select: " + error)       
 
-    def create_dropdown(self,options,cordx,cordy,func):
+    def create_dropdown(self,options,cordx,cordy):
         """creates a dropdown menu providing {options} as possible selections"""
-        try:
-            def print_option(choice):
-                print({choice})
-            self.selection = tk.StringVar()
-            dropdown = tk.OptionMenu(self.frame,self.selection,*options,command=lambda choice: self.on_select(print_option({choice})))
-            dropdown.grid(column= cordx, row=cordy)
-        except Exception as error:
-            print("error in on_select: " + error)
+        self.selection = tk.StringVar()
+        dropdown = tk.OptionMenu(self.frame,self.selection,*options,command= self.on_select)
+        dropdown.grid(column= cordx, row=cordy)
 
     def create_table(self,cordx,cordy,columns,data):
         """creates a table to display information in the frame"""
@@ -186,21 +171,5 @@ class TileFrame():
         # Define column headings
         for col in columns:
             tree.heading(col, text=col)  # Set column headings
-            tree.column(col, anchor="e", width=100)
-
-    def new_entry_field(self,row,label=None):
-        """ add entry field to frame """
-        info = tk.StringVar()
-        if label is not None:
-            entry_label = tk.Label(self.frame,text=label)
-            entry_label.grid(row=row,column=1)
-        entry = tk.Entry(self.frame,width=20,textvariable=info)
-        entry.grid(row= row,column= 2)
-
-    def new_button(self,text,row,column,func=None):
-        """create a button"""
-        button = tk.Button(self.frame,text=text,command=func)
-        button.grid(row=row,column=column)
-
-
+            tree.column(col, anchor="e", width=100) 
 
